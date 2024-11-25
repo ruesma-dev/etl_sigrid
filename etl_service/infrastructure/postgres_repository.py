@@ -4,8 +4,8 @@ import logging
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
-from domain.repositories_interfaces import PostgresRepositoryInterface
-from domain.entities import Database
+from etl_service.domain.repositories_interfaces import PostgresRepositoryInterface
+from etl_service.domain.entities import Database
 from typing import List
 import pandas as pd
 

@@ -36,3 +36,8 @@ class PostgresRepositoryInterface(ABC):
     @abstractmethod
     def close_connection(self):
         pass
+
+class BaseTransformation(ABC):
+    @abstractmethod
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        pass
