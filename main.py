@@ -115,3 +115,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# TODO: implementar coso de uso de solo modificar tablas que han sido cambiadas con respecto a la ultima insercion
+# TODO implementar logging
+# TODO: implementar borrado tempDB
+# TODO: implementar conexion entre servicios

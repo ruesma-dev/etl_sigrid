@@ -1,0 +1,35 @@
+# restoration_service/Dockerfile
+
+FROM python:3.9-slim
+
+# Variables de entorno para evitar escritura de bytecode y buffering
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Establecer directorio de trabajo
+WORKDIR /app
+
+# Instalar dependencias del sistema necesarias (como ODBC Driver)
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    gnupg2 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Descargar e instalar Microsoft ODBC Driver para SQL Server
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y msodbcsql17 unixodbc-dev
+
+# Copiar y instalar dependencias de Python
+COPY requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copiar el código de la aplicación
+COPY . .
+
+# Comando por defecto
+CMD ["python", "main.py"]

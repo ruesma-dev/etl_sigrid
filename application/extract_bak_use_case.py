@@ -4,6 +4,7 @@ from infrastructure.network_drive_service import NetworkDriveService
 from infrastructure.file_service import FileService
 import logging
 from typing import List
+import os
 
 
 class ExtractBakUseCase:
