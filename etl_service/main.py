@@ -1,24 +1,20 @@
 # etl_service/main.py
 
 import logging
+import sys
 from infrastructure.config import Config
 from domain.entities import Database
 from infrastructure.sql_server_repository import SQLServerRepository
 from infrastructure.postgres_repository import PostgresRepository
 from application.extract_use_case import ExtractUseCase
 from application.load_use_case import LoadUseCase
+from application.etl_process_use_case import ETLProcessUseCase
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
+
 def main(tables_to_transfer=None):
     logging.info("=== Iniciando el proceso ETL ===")
-
-    # Si no se proporciona una lista de tablas, se transferirán todas
-    if tables_to_transfer is None:
-        tables_to_transfer = []
-        logging.info("No se proporcionaron tablas; se transferirán todas las tablas.")
-    else:
-        logging.info(f"Tablas especificadas para transferir: {tables_to_transfer}")
 
     # Configuración de la base de datos SQL Server
     sql_server_db = Database(
@@ -37,52 +33,40 @@ def main(tables_to_transfer=None):
         password=Config.PG_PASSWORD,
     )
 
-    # Inicializar repositorios
+    # Inicializar repositorios y casos de uso
     try:
-        logging.info("Inicializando el repositorio SQL Server...")
         sql_server_repo = SQLServerRepository(sql_server_db)
-        logging.info("Repositorio SQL Server inicializado correctamente.")
-
-        logging.info("Inicializando el repositorio PostgreSQL...")
         postgres_repo = PostgresRepository(postgres_db)
-        logging.info("Repositorio PostgreSQL inicializado correctamente.")
+
+        extract_use_case = ExtractUseCase(sql_server_repo)
+        load_use_case = LoadUseCase(postgres_repo)
+
+        etl_process_use_case = ETLProcessUseCase(extract_use_case, load_use_case)
     except Exception as e:
-        logging.error(f"Error al inicializar los repositorios: {e}")
+        logging.error(f"Error al inicializar los componentes: {e}")
         return
 
-    # Inicializar casos de uso
-    extract_use_case = ExtractUseCase(sql_server_repo)
-    load_use_case = LoadUseCase(postgres_repo)
-
     try:
-        # Extraer datos de SQL Server
-        extracted_data = extract_use_case.execute(tables_to_transfer)
+        # Obtener la lista de tablas a transferir
+        if not tables_to_transfer:
+            tables_to_transfer = sql_server_repo.get_table_names()
+            logging.info(f"Se transferirán todas las tablas: {tables_to_transfer}")
+        else:
+            logging.info(f"Tablas especificadas para transferir: {tables_to_transfer}")
 
-        # Cargar datos en PostgreSQL
-        load_use_case.execute(extracted_data)
+        # Ejecutar el proceso ETL
+        etl_process_use_case.execute(tables_to_transfer)
 
     except Exception as e:
         logging.error(f"El proceso ETL falló: {e}")
-
     finally:
-        # Cerrar las conexiones después de terminar
-        try:
-            sql_server_repo.close_connection()
-            logging.info("Conexión a SQL Server cerrada correctamente.")
-        except Exception as e:
-            logging.error(f"Error al cerrar la conexión a SQL Server: {e}")
-
-        try:
-            postgres_repo.close_connection()
-            logging.info("Conexión a PostgreSQL cerrada correctamente.")
-        except Exception as e:
-            logging.error(f"Error al cerrar la conexión a PostgreSQL: {e}")
-
+        # Cerrar conexiones
+        sql_server_repo.close_connection()
+        postgres_repo.close_connection()
         logging.info("=== Proceso ETL completado ===")
 
-# Si deseas ejecutar el script desde la línea de comandos
+
 if __name__ == '__main__':
-    import sys
     if len(sys.argv) > 1:
         tables_to_transfer = sys.argv[1:]
     else:

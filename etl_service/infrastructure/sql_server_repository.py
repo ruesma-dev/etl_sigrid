@@ -134,3 +134,15 @@ class SQLServerRepository(SQLServerRepositoryInterface):
         except Exception as e:
             logging.error(f"Error al cerrar la conexión a SQL Server: {e}")
             raise
+
+    def get_table_row_count(self, table_name: str) -> int:
+        """Obtiene el número de filas de una tabla específica."""
+        try:
+            with self.engine.connect() as connection:
+                query = text(f"SELECT COUNT(*) FROM [{table_name}]")
+                result = connection.execute(query)
+                row_count = result.scalar()
+                return row_count
+        except Exception as e:
+            logging.error(f"Error al obtener el número de filas de la tabla '{table_name}': {e}")
+            raise
