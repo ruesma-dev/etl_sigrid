@@ -1,4 +1,4 @@
-# infrastructure/config.py
+# etl_service/infrastructure/config.py
 
 import os
 from dotenv import load_dotenv

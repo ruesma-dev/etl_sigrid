@@ -1,6 +1,8 @@
+# etl_service/domain/repositories_interfaces.py
+
 from abc import ABC, abstractmethod
 from typing import List
-from domain.entities import Database  # Asegúrate de importar la clase Database correctamente
+from domain.entities import Database
 import pandas as pd
 
 
@@ -20,11 +22,15 @@ class SQLServerRepositoryInterface(ABC):
 
 class PostgresRepositoryInterface(ABC):
     @abstractmethod
-    def get_table_names(self) -> List[str]:
+    def create_database_if_not_exists(self):
         pass
 
     @abstractmethod
-    def read_table(self, table_name: str, columns: List[str] = None):
+    def insert_table(self, df: pd.DataFrame, table_name: str):
+        pass
+
+    @abstractmethod
+    def get_table_names(self) -> List[str]:
         pass
 
     @abstractmethod

@@ -1,4 +1,5 @@
-# domain/entities.py
+# etl_service/domain/entities.py
+
 from dataclasses import dataclass
 
 @dataclass

@@ -1,13 +1,24 @@
+# etl_service/main.py
+
 import logging
 from infrastructure.config import Config
 from domain.entities import Database
 from infrastructure.sql_server_repository import SQLServerRepository
-from infrastructure.postgres_repository import PostgresRepository  # Nuevo repositorio para PostgreSQL
+from infrastructure.postgres_repository import PostgresRepository
+from application.extract_use_case import ExtractUseCase
+from application.load_use_case import LoadUseCase
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-def main():
-    logging.info("=== Iniciando el proceso ===")
+def main(tables_to_transfer=None):
+    logging.info("=== Iniciando el proceso ETL ===")
+
+    # Si no se proporciona una lista de tablas, se transferirán todas
+    if tables_to_transfer is None:
+        tables_to_transfer = []
+        logging.info("No se proporcionaron tablas; se transferirán todas las tablas.")
+    else:
+        logging.info(f"Tablas especificadas para transferir: {tables_to_transfer}")
 
     # Configuración de la base de datos SQL Server
     sql_server_db = Database(
@@ -24,60 +35,56 @@ def main():
         port=int(Config.PG_PORT),
         user=Config.PG_USER,
         password=Config.PG_PASSWORD,
-        data_path='',  # PostgreSQL no necesita paths específicos aquí
-        log_path=''
     )
 
-
-    # Inicializar el repositorio de SQL Server
+    # Inicializar repositorios
     try:
         logging.info("Inicializando el repositorio SQL Server...")
         sql_server_repo = SQLServerRepository(sql_server_db)
         logging.info("Repositorio SQL Server inicializado correctamente.")
-    except Exception as e:
-        logging.error(f"Error al inicializar el repositorio SQL Server: {e}")
-        return
 
-    # Inicializar el repositorio de PostgreSQL
-    try:
         logging.info("Inicializando el repositorio PostgreSQL...")
-        postgres_repo = PostgresRepository(postgres_db)  # Nuevo repositorio para PostgreSQL
+        postgres_repo = PostgresRepository(postgres_db)
         logging.info("Repositorio PostgreSQL inicializado correctamente.")
     except Exception as e:
-        logging.error(f"Error al inicializar el repositorio PostgreSQL: {e}")
+        logging.error(f"Error al inicializar los repositorios: {e}")
         return
 
-    # Paso 1: Obtener los nombres de las tablas de SQL Server
+    # Inicializar casos de uso
+    extract_use_case = ExtractUseCase(sql_server_repo)
+    load_use_case = LoadUseCase(postgres_repo)
+
     try:
-        logging.info("Obteniendo los nombres de las tablas de SQL Server...")
-        sql_server_tables = sql_server_repo.get_table_names()
-        logging.info(f"Tablas encontradas en SQL Server: {sql_server_tables}")
+        # Extraer datos de SQL Server
+        extracted_data = extract_use_case.execute(tables_to_transfer)
+
+        # Cargar datos en PostgreSQL
+        load_use_case.execute(extracted_data)
+
     except Exception as e:
-        logging.error(f"Error al obtener los nombres de las tablas de SQL Server: {e}")
+        logging.error(f"El proceso ETL falló: {e}")
 
-    # Paso 2: Obtener los nombres de las tablas de PostgreSQL
-    try:
-        logging.info("Obteniendo los nombres de las tablas de PostgreSQL...")
-        postgres_tables = postgres_repo.get_table_names()
-        logging.info(f"Tablas encontradas en PostgreSQL: {postgres_tables}")
-    except Exception as e:
-        logging.error(f"Error al obtener los nombres de las tablas de PostgreSQL: {e}")
+    finally:
+        # Cerrar las conexiones después de terminar
+        try:
+            sql_server_repo.close_connection()
+            logging.info("Conexión a SQL Server cerrada correctamente.")
+        except Exception as e:
+            logging.error(f"Error al cerrar la conexión a SQL Server: {e}")
 
-    # Cerrar la conexión de SQL Server después de terminar
-    try:
-        sql_server_repo.close_connection()
-        logging.info("Conexión a SQL Server cerrada correctamente.")
-    except Exception as e:
-        logging.error(f"Error al cerrar la conexión a SQL Server: {e}")
+        try:
+            postgres_repo.close_connection()
+            logging.info("Conexión a PostgreSQL cerrada correctamente.")
+        except Exception as e:
+            logging.error(f"Error al cerrar la conexión a PostgreSQL: {e}")
 
-    # Cerrar la conexión de PostgreSQL después de terminar
-    try:
-        postgres_repo.close_connection()
-        logging.info("Conexión a PostgreSQL cerrada correctamente.")
-    except Exception as e:
-        logging.error(f"Error al cerrar la conexión a PostgreSQL: {e}")
+        logging.info("=== Proceso ETL completado ===")
 
-    logging.info("=== Proceso completado ===")
-
-if __name__ == "__main__":
-    main()
+# Si deseas ejecutar el script desde la línea de comandos
+if __name__ == '__main__':
+    import sys
+    if len(sys.argv) > 1:
+        tables_to_transfer = sys.argv[1:]
+    else:
+        tables_to_transfer = []
+    main(tables_to_transfer)
