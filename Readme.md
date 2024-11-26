@@ -49,8 +49,83 @@ The project adheres to the **Clean Architecture** principles, ensuring a separat
 
 ### Project Structure
 
+## Project Structure
 
----
+```bash
+database_restoration_microservice/
+├── ingestion_service/
+│   ├── application/
+│   │   ├── ingest_use_case.py
+│   │   └── __init__.py
+│   ├── domain/
+│   │   ├── entities.py
+│   │   ├── repositories_interfaces.py
+│   │   └── __init__.py
+│   ├── infrastructure/
+│   │   ├── config.py
+│   │   ├── file_service.py
+│   │   ├── network_drive_service.py
+│   │   └── __init__.py
+│   ├── main.py
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── README.md
+├── restoration_service/
+│   ├── application/
+│   │   ├── restore_database_use_case.py
+│   │   └── __init__.py
+│   ├── domain/
+│   │   ├── entities.py
+│   │   ├── repositories_interfaces.py
+│   │   └── __init__.py
+│   ├── infrastructure/
+│   │   ├── config.py
+│   │   ├── sql_server_repository.py
+│   │   └── __init__.py
+│   ├── main.py
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── README.md
+├── etl_service/
+│   ├── application/
+│   │   ├── transformations/
+│   │   │   ├── date_transformation.py
+│   │   │   ├── transformation_factory.py
+│   │   │   └── __init__.py
+│   │   ├── etl_process_use_case.py
+│   │   ├── extract_use_case.py
+│   │   ├── transformer.py
+│   │   ├── load_use_case.py
+│   │   └── __init__.py
+│   ├── domain/
+│   │   ├── entities.py
+│   │   ├── repositories_interfaces.py
+│   │   └── __init__.py
+│   ├── infrastructure/
+│   │   ├── config.py
+│   │   ├── postgres_repository.py
+│   │   ├── sql_server_repository.py
+│   │   └── __init__.py
+│   ├── main.py
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── README.md
+├── shared/
+│   ├── domain/
+│   │   ├── entities.py
+│   │   ├── repositories_interfaces.py
+│   │   └── __init__.py
+│   ├── infrastructure/
+│   │   ├── config.py
+│   │   ├── logging.py
+│   │   └── __init__.py
+│   └── utils/
+│       ├── helper_functions.py
+│       └── __init__.py
+├── docker-compose.yml
+├── .env
+└── README.md
+```
 
 ## Features
 

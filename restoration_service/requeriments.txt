@@ -1,5 +1,0 @@
-sqlalchemy
-pyodbc
-pika
-python-dotenv
-pandas
