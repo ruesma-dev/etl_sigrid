@@ -29,11 +29,7 @@ class DateTransformation(BaseTransformation):
                     df[col] = df[col].replace(0, pd.NA)
                     logging.info(f"Valores 0 en la columna '{col}' reemplazados por NaN.")
 
-                print("Antes de la conversión:", df[col])
-
                 df[col] = pd.to_datetime(df[col].astype(str), format='%Y%m%d', errors='coerce')
-
-                print("Después de la conversión:", df[col])
 
                 logging.info(f"Columna '{col}' convertida a datetime con formato '%Y%m%d'.")
 
