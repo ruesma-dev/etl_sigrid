@@ -30,7 +30,12 @@ class ETLProcessUseCase:
                     logging.info(f"Tabla '{table_name}' transformada exitosamente.")
 
                     # Determinar el nombre de la tabla de destino
-                    target_table_name = 'FactObra' if table_name.lower() == 'obr' else table_name
+                    if table_name.lower() == 'obr':
+                        target_table_name = 'FacObra'
+                    elif table_name.lower() == 'cen':
+                        target_table_name = 'centro_costes'
+                    else:
+                        target_table_name = table_name
 
                     # Cargar datos en PostgreSQL
                     self.load_use_case.execute({target_table_name: transformed_df})

@@ -1,6 +1,6 @@
 # etl_service/application/load_use_case.py
 
-from domain.repositories_interfaces import PostgresRepositoryInterface
+from etl_service.domain.repositories_interfaces import PostgresRepositoryInterface
 import logging
 
 class LoadUseCase:

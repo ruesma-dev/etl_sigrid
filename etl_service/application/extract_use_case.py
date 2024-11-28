@@ -1,6 +1,6 @@
 # etl_service/application/extract_use_case.py
 
-from domain.repositories_interfaces import SQLServerRepositoryInterface
+from etl_service.domain.repositories_interfaces import SQLServerRepositoryInterface
 from typing import List
 import pandas as pd
 import logging

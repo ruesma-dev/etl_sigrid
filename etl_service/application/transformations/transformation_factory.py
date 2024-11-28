@@ -44,6 +44,32 @@ class TransformationFactory:
             # Añadir la transformación para ordenar columnas alfabéticamente
             transformations.append(SortColumnsTransformation(ascending=True))  # Cambia a False si deseas orden descendente
 
-        # Aquí puedes añadir más transformaciones para otras tablas
+        elif table_name.lower() == 'cen':
+            # Definir el mapeo de columnas de fecha para la tabla 'cen' (centro_costes)
+            column_mapping_cen = {
+                'fecfinpre': 'fecha_fin_previsto',
+                'fecfinrea': 'fecha_fin_real',
+                'fecbloqueo': 'fecha_bloqueo',
+                'fecfincie': 'fecha_fin_cierre'
+            }
+            # Añadir la transformación de fechas para 'cen'
+            transformations.append(DateTransformation(column_mapping=column_mapping_cen, null_if_zero=True))
+            # Añadir la transformación para eliminar columnas con todos NULL, 0 o cadenas en blanco
+            transformations.append(DropNullOrZeroColumnsTransformation())
+            # Definir el mapeo para renombrar la tabla 'cen' a 'centro_costes'
+            # Suponiendo que deseas renombrar la tabla al cargar, manejarás esto en el caso de uso de carga
+            # Sin embargo, si hay columnas específicas que necesiten renombrarse, añade aquí
+            # Por ejemplo, si hay alguna columna 'res' similar a 'obr', podrías añadir:
+            # rename_mapping_cen = {
+            #     'res': 'nombre_obra_centro'
+            # }
+            # transformations.append(RenameColumnsTransformation(rename_mapping=rename_mapping_cen))
+            # Añadir la transformación para ordenar columnas alfabéticamente
+            transformations.append(
+                SortColumnsTransformation(ascending=True))  # Cambia a False si deseas orden descendente
+
+            # Aquí puedes añadir más transformaciones para otras tablas
+
+        return transformations
 
         return transformations
