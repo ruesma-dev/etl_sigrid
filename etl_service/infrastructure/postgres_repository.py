@@ -8,7 +8,7 @@ from etl_service.domain.repositories_interfaces import PostgresRepositoryInterfa
 from etl_service.domain.entities import Database
 from typing import List
 import pandas as pd
-from etl_service.application.transformations.primary_key_mapping import PRIMARY_KEY_MAPPING
+# Eliminada la importación de PRIMARY_KEY_MAPPING
 
 class PostgresRepository(PostgresRepositoryInterface):
     def __init__(self, database: Database):

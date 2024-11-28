@@ -4,7 +4,7 @@ import logging
 import pandas as pd
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, DateTime
 from sqlalchemy.exc import SQLAlchemyError
-from etl_service.application.transformations.primary_key_mapping import PRIMARY_KEY_MAPPING
+from etl_service.application.transformations.table_config import TABLE_CONFIG
 
 
 class LoadUseCase:
@@ -24,21 +24,29 @@ class LoadUseCase:
             for table_name, df in data_frames.items():
                 logging.info(f"Cargando datos en la tabla '{table_name}'.")
 
+                # Buscar la configuración correspondiente al target_table_name
+                config = next((config for config in TABLE_CONFIG.values() if config['target_table'] == table_name),
+                              None)
+
+                if not config:
+                    logging.error(
+                        f"No existe una configuración para la tabla de destino '{table_name}'. Saltando esta tabla.")
+                    continue
+
+                primary_key = config.get('primary_key')
+
                 # Verificar si la tabla ya existe
                 if self.postgres_repo.table_exists(table_name):
                     logging.info(f"La tabla '{table_name}' ya existe. Insertando datos.")
-                    self.postgres_repo.insert_data(table_name, df)
+                    self.postgres_repo.insert_table(df, table_name, if_exists='append')
                 else:
                     logging.info(f"La tabla '{table_name}' no existe. Creando tabla y cargando datos.")
-
-                    # Obtener la columna que será la clave primaria si existe
-                    primary_key = PRIMARY_KEY_MAPPING.get(table_name)
 
                     # Crear la tabla con la clave primaria si está definida
                     self.postgres_repo.create_table(table_name, df, primary_key)
 
                     # Insertar los datos
-                    self.postgres_repo.insert_data(table_name, df)
+                    self.postgres_repo.insert_table(df, table_name, if_exists='append')
 
                 logging.info(f"Datos cargados exitosamente en la tabla '{table_name}'.")
 
