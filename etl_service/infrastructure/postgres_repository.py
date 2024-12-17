@@ -145,3 +145,18 @@ class PostgresRepository(PostgresRepositoryInterface):
         except Exception as e:
             logging.error(f"Error al cerrar la conexión a PostgreSQL: {e}")
             raise
+
+    def query(self, query: str) -> list:
+        """
+        Ejecuta una consulta SQL y devuelve los resultados.
+
+        :param query: Consulta SQL a ejecutar.
+        :return: Lista de resultados.
+        """
+        try:
+            with self.engine.connect() as connection:
+                result = connection.execute(text(query))
+                return result.fetchall()
+        except SQLAlchemyError as e:
+            logging.error(f"Error al ejecutar la consulta '{query}': {e}")
+            raise

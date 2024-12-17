@@ -3,7 +3,7 @@
 TABLE_CONFIG = {
     'obr': {
         'source_table': 'obr',  # Nombre de la tabla en la base de datos de origen
-        'target_table': 'FacObra',
+        'target_table': 'FactObra',
         'primary_key': 'ide',
         'rename_columns': {
             'res': 'nombre_obra'
@@ -21,7 +21,18 @@ TABLE_CONFIG = {
             'fecapelic',
             'feclic',
             'fecofe'
-        ]
+        ],
+        'foreign_keys': [
+            {
+                'column': 'cenide',
+                'ref_table': 'DimCentroCoste',
+                'ref_column': 'ide'
+            }
+            # Añade más claves foráneas según sea necesario
+        ],
+        'data_cleaning': {
+            'handle_invalid_foreign_keys': 'add_placeholder'  # Opciones: 'delete', 'set_null', 'add_placeholder'
+        }
     },
     'cen': {
         'source_table': 'cen',  # Nombre de la tabla en la base de datos de origen
@@ -37,7 +48,11 @@ TABLE_CONFIG = {
             'fecfinrea',
             'fecbloqueo',
             'fecfincie'
-        ]
+        ],
+        'foreign_keys': [],
+        'data_cleaning': {
+            'add_placeholder_row': True  # Indicamos que se debe agregar una fila placeholder
+        }
     },
     # Añade más tablas y sus configuraciones aquí si es necesario
 }
