@@ -9,16 +9,15 @@ from etl_service.application.transformations.table_config import TABLE_CONFIG
 from etl_service.application.transformations.row_modifications_mapping import ROW_INSERTION_MAPPING, ROW_DELETION_MAPPING
 from etl_service.application.transformations.add_rows_transformation import AddRowsTransformation
 from etl_service.application.transformations.delete_rows_transformation import DeleteRowsTransformation
-
+from etl_service.application.transformations.combine_columns_transformation import CombineColumnsTransformation
 
 class TransformationFactory:
     @staticmethod
     def get_transformations(table_key: str) -> list:
         """
-        Retorna una lista de transformaciones aplicables a la tabla especificada, incluyendo la adición y eliminación de filas.
-
-        :param table_key: Clave de la tabla en TABLE_CONFIG.
-        :return: Lista de instancias de transformaciones.
+        Retorna una lista de transformaciones aplicables a la tabla especificada, incluyendo la adición y eliminación de filas,
+        transformación de fechas, eliminación de columnas vacías, renombrado de columnas, orden alfabético, y la creación de
+        nuevas columnas combinando columnas existentes.
         """
         transformations = []
 
@@ -27,6 +26,9 @@ class TransformationFactory:
             rename_mapping = config.get('rename_columns', {})
             date_columns = config.get('date_columns', [])
             target_table_name = config.get('target_table')
+
+            # Obtener configuraciones de columnas a combinar
+            combine_columns_config = config.get('combine_columns', [])
 
             # Añadir la transformación para añadir filas si hay filas definidas en ROW_INSERTION_MAPPING
             rows_to_add = ROW_INSERTION_MAPPING.get(target_table_name, [])
@@ -54,6 +56,21 @@ class TransformationFactory:
                     )
                 )
 
+            # Añadir transformaciones para combinar columnas si las hay
+            for combo_config in combine_columns_config:
+                new_col = combo_config.get('new_column_name')
+                cols_to_combine = combo_config.get('columns_to_combine', [])
+                sep = combo_config.get('separator', '_')
+                if new_col and cols_to_combine:
+                    transformations.append(
+                        CombineColumnsTransformation(
+                            new_column_name=new_col,
+                            columns_to_combine=cols_to_combine,
+                            separator=sep
+                        )
+                    )
+                    logging.info(f"Añadido CombineColumnsTransformation para la tabla '{table_key}' creando '{new_col}'.")
+
             # Añadir la transformación para eliminar columnas con todos NULL, 0 o cadenas en blanco
             transformations.append(DropNullOrZeroColumnsTransformation())
 
@@ -65,10 +82,11 @@ class TransformationFactory:
 
             # Añadir la transformación para ordenar columnas alfabéticamente
             transformations.append(
-                SortColumnsTransformation(ascending=True)  # Cambia a False si deseas orden descendente
+                SortColumnsTransformation(ascending=True)
             )
         else:
             logging.warning(
-                f"No se encontraron mapeos de columnas para la tabla '{table_key}'. No se aplicarán transformaciones específicas.")
+                f"No se encontraron mapeos de columnas para la tabla '{table_key}'. No se aplicarán transformaciones específicas."
+            )
 
         return transformations
