@@ -13,28 +13,48 @@ class DropNullOrZeroColumnsTransformation(BaseTransformation):
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         try:
-            # Identificar columnas donde todos los valores son NULL, 0 o cadenas en blanco
             cols_to_drop = []
             for col in df.columns:
-                # Obtener la serie de la columna
                 series = df[col]
+
+                # Si la columna es de tipo objeto, intentar manejar bytes y strings
+                if pd.api.types.is_object_dtype(series):
+                    # Intentar decodificar valores bytes a str
+                    def to_str(val):
+                        if isinstance(val, bytes):
+                            try:
+                                return val.decode('utf-8', errors='replace')  # Reemplazar caracteres inválidos
+                            except Exception as decode_err:
+                                logging.warning(f"No se pudo decodificar un valor en la columna '{col}': {decode_err}")
+                                # Si no se puede decodificar, forzar a string
+                                return str(val)
+                        # Si no es bytes, convertir a string directamente
+                        return str(val) if val is not None else val
+
+                    series = series.apply(to_str)
+                    df[col] = series
+
+                    # Ahora que la columna es string, podemos aplicar strip()
+                    series = series.fillna('').apply(lambda x: x.strip() if isinstance(x, str) else x)
+                    df[col] = series
 
                 # Verificar si todos los valores son NULL
                 all_null = series.isnull().all()
 
                 # Verificar si todos los valores son 0 (ignorando NULL)
-                if series.dtype in ['int64', 'float64']:
-                    all_zero = (series.dropna() == 0).all() if not series.dropna().empty else False
+                if pd.api.types.is_numeric_dtype(series):
+                    non_null_series = series.dropna()
+                    all_zero = (non_null_series == 0).all() if not non_null_series.empty else False
                 else:
                     all_zero = False
 
                 # Verificar si todos los valores son cadenas en blanco (ignorando NULL)
-                if series.dtype == 'object':
-                    all_blank = (series.dropna().str.strip() == '').all() if not series.dropna().empty else False
+                if pd.api.types.is_string_dtype(series):
+                    non_null_series = series.dropna()
+                    all_blank = (non_null_series == '').all() if not non_null_series.empty else False
                 else:
                     all_blank = False
 
-                # Si alguna de las condiciones se cumple, marcar la columna para eliminar
                 if all_null or all_zero or all_blank:
                     cols_to_drop.append(col)
                     logging.info(f"Columna '{col}' marcada para ser eliminada (todos los valores son NULL, 0 o cadenas en blanco).")

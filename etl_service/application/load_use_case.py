@@ -23,7 +23,7 @@ class LoadUseCase:
         """
         try:
             for table_name, df in data_frames.items():
-                logging.info(f"Cargando datos en la tabla '{table_name}'.")
+                # logging.info(f"Cargando datos en la tabla '{table_name}'.")
 
                 # Buscar la configuración correspondiente al target_table_name
                 config = next((config for config in TABLE_CONFIG.values() if config['target_table'] == table_name), None)
@@ -37,10 +37,10 @@ class LoadUseCase:
 
                 # Verificar si la tabla ya existe en PostgreSQL
                 if self.postgres_repo.table_exists(table_name):
-                    logging.info(f"La tabla '{table_name}' ya existe. Insertando datos.")
+                    # logging.info(f"La tabla '{table_name}' ya existe. Insertando datos.")
                     self.postgres_repo.insert_table(df, table_name, if_exists='append')
                 else:
-                    logging.info(f"La tabla '{table_name}' no existe. Creando tabla y cargando datos.")
+                    # logging.info(f"La tabla '{table_name}' no existe. Creando tabla y cargando datos.")
                     self.postgres_repo.create_table(table_name, df, primary_key)
                     self.postgres_repo.insert_table(df, table_name, if_exists='append')
 
@@ -60,7 +60,7 @@ class LoadUseCase:
                         else:
                             logging.error(f"Fila no encontrada en '{table_name}': {row}")
 
-                logging.info(f"Datos cargados exitosamente en la tabla '{table_name}'.")
+                # logging.info(f"Datos cargados exitosamente en la tabla '{table_name}'.")
 
         except SQLAlchemyError as e:
             logging.error(f"Error al cargar datos en PostgreSQL: {e}")

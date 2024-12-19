@@ -51,7 +51,7 @@ class SQLServerRepository(SQLServerRepositoryInterface):
                 f"Trusted_Connection=yes;"
             )
 
-        logging.info(f"Cadena de conexión principal: {masked_connection_string}")
+        # logging.info(f"Cadena de conexión principal: {masked_connection_string}")
 
         # Codificar la cadena de conexión
         params = urllib.parse.quote_plus(connection_string)
@@ -59,7 +59,7 @@ class SQLServerRepository(SQLServerRepositoryInterface):
 
         try:
             self.engine: Engine = create_engine(connection_url, echo=True)  # echo=True para depuración
-            logging.info("Motor de conexión a SQL Server para la base de datos principal creado exitosamente.")
+            # logging.info("Motor de conexión a SQL Server para la base de datos principal creado exitosamente.")
         except Exception as e:
             logging.error(f"Error al crear el motor de conexión: {e}")
             raise
@@ -68,7 +68,7 @@ class SQLServerRepository(SQLServerRepositoryInterface):
         try:
             inspector = inspect(self.engine)
             tables = inspector.get_table_names()
-            logging.info(f"Tablas encontradas en SQL Server: {tables}")
+            # logging.info(f"Tablas encontradas en SQL Server: {tables}")
             return tables
         except SQLAlchemyError as e:
             logging.warning(f"Error al obtener nombres de tablas: {e}")
@@ -76,9 +76,9 @@ class SQLServerRepository(SQLServerRepositoryInterface):
 
     def read_table(self, table_name: str, columns: List[str] = None) -> pd.DataFrame:
         try:
-            logging.info(f"Intentando leer la tabla '{table_name}' de la base de datos '{self.database.name}'...")
+            # logging.info(f"Intentando leer la tabla '{table_name}' de la base de datos '{self.database.name}'...")
             df = pd.read_sql_table(table_name, self.engine, columns=columns)
-            logging.info(f"Tabla '{table_name}' leída exitosamente con {len(df)} registros.")
+            # logging.info(f"Tabla '{table_name}' leída exitosamente con {len(df)} registros.")
             return df
         except SQLAlchemyError as e:
             logging.warning(f"Error al leer la tabla '{table_name}': {e}")
@@ -93,14 +93,14 @@ class SQLServerRepository(SQLServerRepositoryInterface):
         """
         try:
             self.engine.dispose()
-            logging.info(f"Motor de conexión a SQL Server para '{self.database.name}' eliminado.")
+            # logging.info(f"Motor de conexión a SQL Server para '{self.database.name}' eliminado.")
 
             # Reconstruir la cadena de conexión sin puerto
             connection_url = f"mssql+pyodbc://{self.database.host}/{self.database.name}?driver={self.database.driver}&trusted_connection=yes"
 
             # Reconectar usando la cadena de conexión URL
             self.engine = create_engine(connection_url, echo=True)
-            logging.info(f"Motor de conexión a SQL Server para '{self.database.name}' reconectado exitosamente.")
+            # logging.info(f"Motor de conexión a SQL Server para '{self.database.name}' reconectado exitosamente.")
             # Verificar que la base de datos está en línea
             self.verify_database_online()
 
@@ -119,7 +119,7 @@ class SQLServerRepository(SQLServerRepositoryInterface):
                 state = result.fetchone()[0]
                 if state != "ONLINE":
                     raise Exception(f"La base de datos '{self.database.name}' no está ONLINE. Estado actual: {state}")
-                logging.info(f"La base de datos '{self.database.name}' está en estado ONLINE.")
+                # logging.info(f"La base de datos '{self.database.name}' está en estado ONLINE.")
         except Exception as e:
             logging.error(f"Error al verificar el estado de la base de datos: {e}")
             raise
@@ -130,7 +130,7 @@ class SQLServerRepository(SQLServerRepositoryInterface):
         """
         try:
             self.engine.dispose()
-            logging.info("Conexión a SQL Server cerrada correctamente.")
+            # logging.info("Conexión a SQL Server cerrada correctamente.")
         except Exception as e:
             logging.error(f"Error al cerrar la conexión a SQL Server: {e}")
             raise

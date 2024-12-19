@@ -12,7 +12,6 @@ from application.etl_process_use_case import ETLProcessUseCase
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-
 def main(tables_to_transfer=None):
     logging.info("=== Iniciando el proceso ETL ===")
 
@@ -39,6 +38,8 @@ def main(tables_to_transfer=None):
         postgres_repo = PostgresRepository(postgres_db)
 
         extract_use_case = ExtractUseCase(sql_server_repo)
+        # print("ExtractUseCase instance:", extract_use_case)  # Verificar que no es None
+
         load_use_case = LoadUseCase(postgres_repo)
 
         etl_process_use_case = ETLProcessUseCase(extract_use_case, load_use_case)
@@ -50,13 +51,12 @@ def main(tables_to_transfer=None):
         # Obtener la lista de tablas a transferir
         if not tables_to_transfer:
             tables_to_transfer = sql_server_repo.get_table_names()
-            logging.info(f"Se transferirán todas las tablas: {tables_to_transfer}")
+            # logging.info(f"Se transferirán todas las tablas: {tables_to_transfer}")
         else:
             logging.info(f"Tablas especificadas para transferir: {tables_to_transfer}")
 
         # Ejecutar el proceso ETL
         etl_process_use_case.execute(tables_to_transfer)
-
     except Exception as e:
         logging.error(f"El proceso ETL falló: {e}")
     finally:
@@ -65,10 +65,14 @@ def main(tables_to_transfer=None):
         postgres_repo.close_connection()
         logging.info("=== Proceso ETL completado ===")
 
-
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         tables_to_transfer = sys.argv[1:]
     else:
-        tables_to_transfer = ['obr', 'cen', 'con', 'auxobrtip', 'auxobrcla', 'conest', 'dca']
+        # tables_to_transfer = ['pro', 'cob', 'dvf', 'dvfpro', 'obr', 'obrctr', 'obrparpar', 'cen', 'con', 'auxobrtip', 'auxobrcla', 'conest', 'dca', 'ctr', 'dcapro', 'dcaproana', 'dcaprodes', 'dcapropar', 'dcaproser', 'dcarec', 'cer', 'cerpro']
+        tables_to_transfer = ['cli', 'prv']
     main(tables_to_transfer)
+
+
+# TODO: en 2a fase incluir en las tablas que son XXXProductos el join con la tabla tratada de con (ver en BI)
+# TODO: todo lo que tenga relacion con "con" hacer un join. con es basicamente informativa, pero no vale como union
