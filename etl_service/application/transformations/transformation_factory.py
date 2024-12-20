@@ -12,9 +12,27 @@ from etl_service.application.transformations.row_modifications_mapping import RO
 from etl_service.application.transformations.add_rows_transformation import AddRowsTransformation
 from etl_service.application.transformations.delete_rows_transformation import DeleteRowsTransformation
 from etl_service.application.transformations.combine_columns_transformation import CombineColumnsTransformation
+from etl_service.application.transformations.join_with_con_transformation import JoinWithConTransformation
 from etl_service.domain.interfaces import SpecificTableTransformations
 
 class TransformationFactory:
+    con_df = None
+    extract_use_case = None
+
+    @staticmethod
+    def load_con_df_if_needed():
+        # Si con_df es None, lo cargamos
+        if TransformationFactory.con_df is None:
+            logging.info("Cargando la tabla 'con' en memoria para joins.")
+            if TransformationFactory.extract_use_case is None:
+                raise ValueError("extract_use_case no está configurado en TransformationFactory.")
+            df_map = TransformationFactory.extract_use_case.execute(['con'])
+            if df_map and 'con' in df_map:
+                TransformationFactory.con_df = df_map['con']
+                logging.info(f"Tabla 'con' cargada con {len(TransformationFactory.con_df)} registros.")
+            else:
+                logging.warning("No se pudo cargar la tabla 'con'. Los joins con 'con' no funcionarán correctamente.")
+
     @staticmethod
     def get_transformations(table_key: str, extract_use_case=None) -> list:
         """
@@ -29,9 +47,24 @@ class TransformationFactory:
             rename_mapping = config.get('rename_columns', {})
             date_columns = config.get('date_columns', [])
             target_table_name = config.get('target_table')
-
-            # Obtener configuraciones de columnas a combinar
             combine_columns_config = config.get('combine_columns', [])
+
+            # Check if join_with_con está presente
+            join_with_con_config = config.get('join_with_con', None)
+            if join_with_con_config:
+                join_column = join_with_con_config.get('join_column')
+                if join_column:
+                    # Si no tenemos extract_use_case, no podemos cargar con
+                    if extract_use_case is None and TransformationFactory.extract_use_case is None:
+                        logging.warning("No extract_use_case provided. Cannot load 'con' for join.")
+                    else:
+                        if TransformationFactory.extract_use_case is None and extract_use_case is not None:
+                            TransformationFactory.extract_use_case = extract_use_case
+                        TransformationFactory.load_con_df_if_needed()
+                        if TransformationFactory.con_df is not None:
+                            transformations.append(JoinWithConTransformation(TransformationFactory.con_df, join_column))
+                        else:
+                            logging.warning("No se pudo realizar el join con 'con' ya que con_df es None.")
 
             # Añadir AddRowsTransformation
             rows_to_add = ROW_INSERTION_MAPPING.get(target_table_name, [])
@@ -77,12 +110,9 @@ class TransformationFactory:
             if spec is not None:
                 mod = importlib.import_module(module_name)
                 TransformClass = getattr(mod, class_name, None)
-                print(f'TransformClass es {TransformClass}')
                 if TransformClass and issubclass(TransformClass, SpecificTableTransformations):
                     if table_key == 'dca':
                         # Pasar extract_use_case como parámetro
-                        print('por aqui vamos')
-                        print(extract_use_case)
                         specific_instance = TransformClass(extract_use_case)
                     else:
                         # Para otras tablas específicas que no necesitan extract_use_case

@@ -6,9 +6,6 @@ from etl_service.application.transformations.base_transformation import BaseTran
 
 class DropNullOrZeroColumnsTransformation(BaseTransformation):
     def __init__(self):
-        """
-        Inicializa la transformación para eliminar columnas con todos los valores como NULL, 0 o cadenas en blanco.
-        """
         pass
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -17,49 +14,52 @@ class DropNullOrZeroColumnsTransformation(BaseTransformation):
             for col in df.columns:
                 series = df[col]
 
-                # Si la columna es de tipo objeto, intentar manejar bytes y strings
+                # Convertir objetos a cadenas decodificadas
                 if pd.api.types.is_object_dtype(series):
-                    # Intentar decodificar valores bytes a str
                     def to_str(val):
                         if isinstance(val, bytes):
                             try:
-                                return val.decode('utf-8', errors='replace')  # Reemplazar caracteres inválidos
+                                return val.decode('utf-8', errors='replace')
                             except Exception as decode_err:
-                                logging.warning(f"No se pudo decodificar un valor en la columna '{col}': {decode_err}")
-                                # Si no se puede decodificar, forzar a string
+                                logging.warning(f"No se pudo decodificar valor en '{col}': {decode_err}")
                                 return str(val)
-                        # Si no es bytes, convertir a string directamente
                         return str(val) if val is not None else val
 
                     series = series.apply(to_str)
                     df[col] = series
 
-                    # Ahora que la columna es string, podemos aplicar strip()
-                    series = series.fillna('').apply(lambda x: x.strip() if isinstance(x, str) else x)
+                    # Aplicar strip si es string
+                    # Primero llenar NaN con '' para no causar error
+                    series = series.fillna('')
+                    # Asegurar que ahora todo es string
+                    series = series.astype(str)
+                    series = series.apply(lambda x: x.strip() if isinstance(x, str) else x)
                     df[col] = series
 
-                # Verificar si todos los valores son NULL
-                all_null = series.isnull().all()
+                # Verificar valores nulos
+                all_null = bool(series.isnull().all())
 
-                # Verificar si todos los valores son 0 (ignorando NULL)
+                # Verificar todos ceros si es numérico
                 if pd.api.types.is_numeric_dtype(series):
                     non_null_series = series.dropna()
-                    all_zero = (non_null_series == 0).all() if not non_null_series.empty else False
+                    all_zero = bool((non_null_series == 0).all() if not non_null_series.empty else False)
                 else:
                     all_zero = False
 
-                # Verificar si todos los valores son cadenas en blanco (ignorando NULL)
+                # Verificar todos en blanco si es string
                 if pd.api.types.is_string_dtype(series):
                     non_null_series = series.dropna()
-                    all_blank = (non_null_series == '').all() if not non_null_series.empty else False
+                    # Convertir a str para evitar problemas
+                    non_null_series = non_null_series.astype(str)
+                    all_blank = bool((non_null_series == '').all() if not non_null_series.empty else False)
                 else:
                     all_blank = False
 
+                # Ahora all_null, all_zero y all_blank deberían ser booleanos puros
                 if all_null or all_zero or all_blank:
                     cols_to_drop.append(col)
-                    logging.info(f"Columna '{col}' marcada para ser eliminada (todos los valores son NULL, 0 o cadenas en blanco).")
+                    logging.info(f"Columna '{col}' marcada para eliminar (todos NULL, 0 o blanco).")
 
-            # Eliminar las columnas identificadas
             if cols_to_drop:
                 df = df.drop(columns=cols_to_drop)
                 logging.info(f"Columnas eliminadas: {cols_to_drop}")

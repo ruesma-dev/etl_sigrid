@@ -69,10 +69,19 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         tables_to_transfer = sys.argv[1:]
     else:
-        # tables_to_transfer = ['pro', 'cob', 'dvf', 'dvfpro', 'obr', 'obrctr', 'obrparpar', 'cen', 'con', 'auxobrtip', 'auxobrcla', 'conest', 'dca', 'ctr', 'dcapro', 'dcaproana', 'dcaprodes', 'dcapropar', 'dcaproser', 'dcarec', 'cer', 'cerpro']
-        tables_to_transfer = ['cli', 'prv']
+        # tables_to_transfer = ['dcf', 'dcfpro', 'cli', 'pro', 'cob', 'dvf', 'dvfpro', 'obr', 'obrctr', 'obrparpar', 'cen', 'con', 'auxobrtip', 'auxobrcla', 'conest', 'dca', 'ctr', 'dcapro', 'dcaproana', 'dcaprodes', 'dcapropar', 'dcaproser', 'dcarec', 'cer', 'cerpro']
+        tables_to_transfer = ['auxobrtip']
+        # tables_to_transfer = ['obr']
     main(tables_to_transfer)
 
 
-# TODO: en 2a fase incluir en las tablas que son XXXProductos el join con la tabla tratada de con (ver en BI)
-# TODO: todo lo que tenga relacion con "con" hacer un join. con es basicamente informativa, pero no vale como union
+# TODO: falta el total cobrado
+# TODO: partes de horas
+# TODO: falta tema de OEPC como ingresos.
+# TODO: albaranes sin codigo?
+# TODO: almacen
+# TODO: reglas para desglose de partidas en CD, CI, y GG
+# TODO: excel con datos adicionales como presu, ODC aprobadas, pendientes, etc...
+
+# TODO: incluir excel cierre en base de datos, crea tabla con bbdd de proyecto en postgres
+# TODO:

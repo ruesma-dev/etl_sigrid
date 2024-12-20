@@ -1,28 +1,15 @@
-# etl_service/application/transformations/table_config.py
-
-# el nombre de la columna de fecha debe ser el original antes de cambiarlo
-
 TABLE_CONFIG = {
     'obr': {
-        'source_table': 'obr',  # Nombre de la tabla en la base de datos de origen
+        'source_table': 'obr',
         'target_table': 'FactObra',
         'primary_key': 'ide',
         'rename_columns': {
             'res': 'nombre_obra'
-            # Añade más renombrados específicos para 'obr' si es necesario
         },
         'date_columns': [
-            'fecinipre',
-            'fecfinpre',
-            'fecinirea',
-            'fecfinrea',
-            'feccieest',
-            'fecadj',
-            'fecfincie',
-            'fecciepre',
-            'fecapelic',
-            'feclic',
-            'fecofe'
+            'fecinipre', 'fecfinpre', 'fecinirea', 'fecfinrea',
+            'feccieest', 'fecadj', 'fecfincie', 'fecciepre',
+            'fecapelic', 'feclic', 'fecofe'
         ],
         'foreign_keys': [
             {
@@ -30,45 +17,36 @@ TABLE_CONFIG = {
                 'ref_table': 'DimCentroCoste',
                 'ref_column': 'ide'
             }
-            # Añade más claves foráneas según sea necesario
         ],
         'data_cleaning': {
-            'handle_invalid_foreign_keys': 'add_placeholder'  # Opciones: 'delete', 'set_null', 'add_placeholder'
+            'handle_invalid_foreign_keys': 'add_placeholder'
+        },
+        # Hacemos join con 'con' usando cenide = con.ide (según lo solicitado)
+        'join_with_con': {
+            'join_column': 'cenide'
         }
     },
     'cen': {
-        'source_table': 'cen',  # Nombre de la tabla en la base de datos de origen
+        'source_table': 'cen',
         'target_table': 'DimCentroCoste',
         'primary_key': 'ide',
-        'rename_columns': {
-            # Añade renombrados específicos para 'cen' si es necesario
-            # Ejemplo:
-            # 'columna_original': 'columna_renombrada'
-        },
-        'date_columns': [
-            'fecfinpre',
-            'fecfinrea',
-            'fecbloqueo',
-            'fecfincie'
-        ],
+        'rename_columns': {},
+        'date_columns': ['fecfinpre', 'fecfinrea', 'fecbloqueo', 'fecfincie'],
         'foreign_keys': [],
         'data_cleaning': {
-            'add_placeholder_row': True  # Indicamos que se debe agregar una fila placeholder
+            'add_placeholder_row': True
         }
     },
     'con': {
-        'source_table': 'con',  # Nombre de la tabla en la base de datos de origen
+        'source_table': 'con',
         'target_table': 'DimConceptosETC',
         'primary_key': 'ide',
         'rename_columns': {
             'fec': 'fecha_alta',
             'fecbaj': 'fecha_baja',
         },
-        'date_columns': [
-            'fec',
-            'fecbaj'
-        ],
-        'foreign_keys': [],  # Si es necesario, añadir aquí claves foráneas
+        'date_columns': ['fec','fecbaj'],
+        'foreign_keys': [],
         'data_cleaning': {},
         'combine_columns': [
             {
@@ -85,9 +63,7 @@ TABLE_CONFIG = {
         'rename_columns': {
             'fecbaj': 'fecha_baja'
         },
-        'date_columns': [
-            'fecbaj'
-        ],
+        'date_columns': ['fecbaj'],
         'foreign_keys': [],
         'data_cleaning': {}
     },
@@ -98,9 +74,7 @@ TABLE_CONFIG = {
         'rename_columns': {
             'fecbaj': 'fecha_baja'
         },
-        'date_columns': [
-            'fecbaj'
-        ],
+        'date_columns': ['fecbaj'],
         'foreign_keys': [],
         'data_cleaning': {}
     },
@@ -108,17 +82,9 @@ TABLE_CONFIG = {
         'source_table': 'conest',
         'target_table': 'DimEstadoConcepto',
         'primary_key': 'ide',
-        'rename_columns': {
-            # No hay columnas de fecha u otras que requieran renombrado,
-            # pero puedes añadir renombrados si lo deseas.
-            # Ejemplo: 'res': 'descripcion_estado'
-        },
-        'date_columns': [],  # No hay columnas de fecha
-        'foreign_keys': [
-            # Referencias: psecan.estide -> conest.ide
-            # Si en el futuro deseas agregar esta clave foránea,
-            # puedes hacerlo aquí.
-        ],
+        'rename_columns': {},
+        'date_columns': [],
+        'foreign_keys': [],
         'data_cleaning': {},
         'combine_columns': [
             {
@@ -130,68 +96,51 @@ TABLE_CONFIG = {
     },
     'dca': {
         'source_table': 'dca',
-        'target_table': 'DimAlbaranCompra',  # Puedes cambiarlo según tu convención
+        'target_table': 'DimAlbaranCompra',
         'primary_key': 'ide',
-        'rename_columns': {
-            # Si deseas renombrar columnas, agrégalos aquí.
-        },
+        'rename_columns': {},
         'date_columns': [
-            'fecdoc',  # Fecha del documento
-            'fecpag',  # Fecha de pago
-            'fecent',  # Fecha entrega prevista
-            'feclim',  # Fecha límite
-            'fecrec',  # Fecha real de recepción
-            'fecfac',  # Fecha facturación
-            'alqfec',  # Fecha periodo alquiler
-            'divcamfec'  # Fecha de cambio divisas
-        ],
-        'foreign_keys': [
-            # Añade claves foráneas si corresponde
-        ],
-        'data_cleaning': {}
-        # No hay secciones combine_columns para esta tabla, ni se requieren
-    },
-    'ctr': {
-        'source_table': 'ctr',
-        'target_table': 'DimContratoCompra',  # Puedes cambiar el nombre del target_table según tu convención
-        'primary_key': 'ide',
-        'rename_columns': {
-            # Añade renombrados si es necesario
-        },
-        'date_columns': [
-            'fecdoc',  # Fecha del documento
-            'fecpag',  # Fecha de pago
-            'fecent',  # Fecha entrega prevista
-            'feclim',  # Fecha limite
-            'fecfac',  # Fecha facturación
-            'divcamfec',  # Fecha de cambio divisas
-            'fecvig1',  # Fecha vigencia contrato desde
-            'fecvig2',  # Fecha vigencia contrato hasta
-            'fecrevpre'  # Revisión de precios. Fecha inicial
+            'fecdoc', 'fecpag', 'fecent', 'feclim', 'fecrec',
+            'fecfac', 'alqfec', 'divcamfec'
         ],
         'foreign_keys': [],
         'data_cleaning': {}
-        # No combine_columns en este caso
+    },
+    'ctr': {
+        'source_table': 'ctr',
+        'target_table': 'DimContratoCompra',
+        'primary_key': 'ide',
+        'rename_columns': {},
+        'date_columns': [
+            'fecdoc', 'fecpag', 'fecent', 'feclim', 'fecfac',
+            'divcamfec', 'fecvig1', 'fecvig2', 'fecrevpre'
+        ],
+        'foreign_keys': [],
+        'data_cleaning': {},
+        # Join con con a través de ide
+        'join_with_con': {
+            'join_column': 'ide'
+        }
     },
     'dcapro': {
-            'source_table': 'dcapro',
-            'target_table': 'DimAlbaranCompraProductos',
-            'primary_key': 'ide',
-            'rename_columns': {},
-            'date_columns': [
-                'fec',     # Fecha prevista
-                'garfec',  # Fecha garantía
-                'fecimp'   # Fecha imputación informativa
-            ],
-            'foreign_keys': [],
-            'data_cleaning': {}
+        'source_table': 'dcapro',
+        'target_table': 'DimAlbaranCompraProductos',
+        'primary_key': 'ide',
+        'rename_columns': {},
+        'date_columns': ['fec','garfec','fecimp'],
+        'foreign_keys': [],
+        'data_cleaning': {},
+        # Join con con a través de docide
+        'join_with_con': {
+            'join_column': 'docide'
+        }
     },
     'dcaproana': {
         'source_table': 'dcaproana',
         'target_table': 'DimAlbaranCompraAnalitica',
         'primary_key': 'ide',
         'rename_columns': {},
-        'date_columns': [],  # No se detectan fechas
+        'date_columns': [],
         'foreign_keys': [],
         'data_cleaning': {}
     },
@@ -200,7 +149,7 @@ TABLE_CONFIG = {
         'target_table': 'DimAlbaranCompraDestinos',
         'primary_key': 'ide',
         'rename_columns': {},
-        'date_columns': [],  # No hay columnas fecha
+        'date_columns': [],
         'foreign_keys': [],
         'data_cleaning': {}
     },
@@ -209,7 +158,7 @@ TABLE_CONFIG = {
         'target_table': 'DimAlbaranCompraPartidas',
         'primary_key': 'ide',
         'rename_columns': {},
-        'date_columns': [],  # Sin fechas
+        'date_columns': [],
         'foreign_keys': [],
         'data_cleaning': {}
     },
@@ -218,9 +167,7 @@ TABLE_CONFIG = {
         'target_table': 'DimAlbaranCompraProductosSeries',
         'primary_key': 'ide',
         'rename_columns': {},
-        'date_columns': [
-            'fec'  # Fecha caducidad
-        ],
+        'date_columns': ['fec'],
         'foreign_keys': [],
         'data_cleaning': {}
     },
@@ -229,43 +176,28 @@ TABLE_CONFIG = {
         'target_table': 'DimAlbaranCompraRecargos',
         'primary_key': 'ide',
         'rename_columns': {},
-        'date_columns': [],  # Sin fechas detectadas
+        'date_columns': [],
         'foreign_keys': [],
         'data_cleaning': {}
     },
-    # obrcer (Obras: Certificaciones por obra)
-    # Columna fec es tipo fecha.
     'obrcer': {
         'source_table': 'obrcer',
         'target_table': 'DimCertificacionObra',
         'primary_key': 'ide',
         'rename_columns': {},
-        'date_columns': [
-            'fec'
-        ],
+        'date_columns': ['fec'],
         'foreign_keys': [],
         'data_cleaning': {}
     },
-
-    # obrcos (Obras: Centros de coste)
-    # Columna orifec es tipo fecha (según la doc orifec = Fecha de origen)
     'obrcos': {
         'source_table': 'obrcos',
         'target_table': 'DimCentroCosteObra',
         'primary_key': 'ide',
         'rename_columns': {},
-        'date_columns': [
-            'orifec'
-        ],
+        'date_columns': ['orifec'],
         'foreign_keys': [],
         'data_cleaning': {}
     },
-
-    # obrctr (Obras: Contratos de obra)
-    # Hay múltiples columnas tipo fecha:
-    # fecprelic, fecrealic, fecpreadj, fecreaadj, fecprefir, fecreafir, fecprefct, fecreafct, fecpreact, fecreaact,
-    # fecpreini, fecreaini, fecprefin, fecreafin, fecprosol, fecprorec, fecproliq, fecproapr, fecdefsol, fecdefrec,
-    # fecdefliq, fecdefapr, fecinipla, fecinigar, fecfingar, fecdevret, fecaprtec, fecapreco, fecultsit, fecrevpre
     'obrctr': {
         'source_table': 'obrctr',
         'target_table': 'DimContratoObra',
@@ -288,191 +220,138 @@ TABLE_CONFIG = {
         'source_table': 'obrparpar',
         'target_table': 'DimPartidasObra',
         'primary_key': 'ide',
-        'rename_columns': {
-
-        },
-        'date_columns': [
-            'fecini',  # Fecha inicio
-            'fecfin'   # Fecha final
-        ],
-        'foreign_keys': [
-            # Añade claves foráneas si corresponde
-            # Ejemplo:
-            # {
-            #     'column': 'obride',
-            #     'ref_table': 'FactObra',
-            #     'ref_column': 'ide'
-            # }
-        ],
+        'rename_columns': {},
+        'date_columns': ['fecini','fecfin'],
+        'foreign_keys': [],
         'data_cleaning': {}
     },
     'cer': {
         'source_table': 'cer',
-        'target_table': 'DimCertificacion',  # Puedes cambiar el nombre según tu convención
+        'target_table': 'DimCertificacion',
         'primary_key': 'ide',
-        'rename_columns': {
-            # Añade renombrados si es necesario
-        },
+        'rename_columns': {},
         'date_columns': [
-            'fecdoc',   # Fecha del documento
-            'feccob',   # Fecha de cobro
-            'fecent',   # Fecha entrega prevista
-            'feclim',   # Fecha límite
-            'fecfac',   # Fecha facturación
-            'divcamfec',# Fecha de cambio divisas
-            'alqfec'    # Fecha periodo alquiler
+            'fecdoc', 'feccob', 'fecent', 'feclim', 'fecfac',
+            'divcamfec', 'alqfec'
         ],
-        'foreign_keys': [
-            # Añade claves foráneas si corresponde
-        ],
+        'foreign_keys': [],
         'data_cleaning': {}
     },
-
     'cerpro': {
         'source_table': 'cerpro',
-        'target_table': 'DimCertificacionProductos', # Cambia el nombre según tu convención
+        'target_table': 'DimCertificacionProductos',
         'primary_key': 'ide',
-        'rename_columns': {
-            # Añade renombrados si es necesario
-        },
-        'date_columns': [
-            'fec',    # Fecha prevista
-            'garfec', # Fecha garantía
-            'fecimp'  # Fecha imputación informativa
-        ],
-        'foreign_keys': [
-            # Añade claves foráneas si corresponde
-        ],
-        'data_cleaning': {}
+        'rename_columns': {},
+        'date_columns': ['fec', 'garfec', 'fecimp'],
+        'foreign_keys': [],
+        'data_cleaning': {},
+        # Join con con a través de docide
+        'join_with_con': {
+            'join_column': 'docide'
+        }
     },
     'cob': {
         'source_table': 'cob',
         'target_table': 'DimCobro',
         'primary_key': 'ide',
-        'rename_columns': {
-            # Añade renombrados si es necesario
-        },
-        'date_columns': [
-            'fecven',   # Fecha de vencimiento
-            'fecrea',   # Fecha de cobro real
-            'fecreaemi',# Fecha de emisión real
-            'divcamfec' # Fecha de cambio divisas
-        ],
-        'foreign_keys': [
-            # Añade claves foráneas si corresponde
-        ],
+        'rename_columns': {},
+        'date_columns': ['fecven', 'fecrea', 'fecreaemi', 'divcamfec'],
+        'foreign_keys': [],
         'data_cleaning': {}
     },
-
     'dvf': {
         'source_table': 'dvf',
         'target_table': 'DimFacturaVenta',
         'primary_key': 'ide',
-        'rename_columns': {
-            # Añade renombrados si es necesario
-        },
+        'rename_columns': {},
         'date_columns': [
-            'fecdoc',   # Fecha del documento
-            'feccob',   # Fecha de cobro
-            'fecent',   # Fecha entrega prevista
-            'feclim',   # Fecha límite
-            'fecfac',   # Fecha facturación
-            'divcamfec',# Fecha de cambio divisas
-            'alqfec'    # Fecha periodo alquiler
+            'fecdoc', 'feccob', 'fecent', 'feclim', 'fecfac',
+            'divcamfec', 'alqfec'
         ],
-        'foreign_keys': [
-            # Añade claves foráneas si corresponde
-        ],
+        'foreign_keys': [],
         'data_cleaning': {}
     },
-
     'dvfpro': {
         'source_table': 'dvfpro',
         'target_table': 'DimFacturaVentaProductos',
         'primary_key': 'ide',
-        'rename_columns': {
-            # Añade renombrados si es necesario
-        },
+        'rename_columns': {},
         'date_columns': [
-            'fec',     # Fecha prevista
-            'garfec',  # Fecha garantía
-            'fecimp',  # Fecha imputación informativa
-            'fec1',    # Fecha1 alquiler (si se considera fecha)
-            'fec2',    # Fecha2 alquiler (si se considera fecha)
-            'perfini', # Periodificación: Fecha inicial
-            'perffin', # Periodificación: Fecha final
-            'alqfec'   # Fecha periodo alquiler (si corresponde)
+            'fec', 'garfec', 'fecimp', 'fec1', 'fec2',
+            'perfini', 'perffin', 'alqfec'
         ],
-        'foreign_keys': [
-            # Añade claves foráneas si corresponde
-        ],
-        'data_cleaning': {}
+        'foreign_keys': [],
+        'data_cleaning': {},
+        # Join con con a través de docide
+        'join_with_con': {
+            'join_column': 'docide'
+        }
     },
     'pro': {
-            'source_table': 'pro',
-            'target_table': 'DimProducto',  # Ajusta el nombre según tu convención
-            'primary_key': 'ide',
-            'rename_columns': {
-                # Añade renombrados específicos para 'pro' si es necesario
-                # Ejemplo:
-                # 'nombre_original': 'nombre_renombrado'
-            },
-            'date_columns': [
-                'fectipdes',    # Fecha descatalogación
-                'fecult',       # Fecha Última Compra
-                'fecser',       # Fecha Servir
-                'fecrec',       # Fecha Recibir
-                'fecultact',    # Fecha última actualización
-                'esigpromf1',   # i-Sigrid promocion desde
-                'esigpromf2',   # i-Sigrid promocion hasta
-                'esigpliqf1',   # i-Sigrid liquidación desde
-                'esigpliqf2',   # i-Sigrid liquidación hasta
-                'esigpnovf1',   # i-Sigrid novedad desde
-                'esigpnovf2',   # i-Sigrid novedad hasta
-            ],
-            'foreign_keys': [
-            ],
-            'data_cleaning': {}
-        },
+        'source_table': 'pro',
+        'target_table': 'DimProducto',
+        'primary_key': 'ide',
+        'rename_columns': {},
+        'date_columns': [
+            'fectipdes', 'fecult', 'fecser', 'fecrec', 'fecultact',
+            'esigpromf1','esigpromf2','esigpliqf1','esigpliqf2',
+            'esigpnovf1','esigpnovf2'
+        ],
+        'foreign_keys': [],
+        'data_cleaning': {}
+    },
     'cli': {
-            'source_table': 'cli',
-            'target_table': 'DimCliente',  # Ajusta el nombre según tu convención
-            'primary_key': 'ide',
-            'rename_columns': {
-                # Añade renombrados específicos para 'cli' si es necesario
-                # Ejemplo:
-                # 'raz': 'razon_social',
-                # 'cif': 'cif_nif'
-            },
-            'date_columns': [
-                'creevafec',  # Fecha evaluación
-                'evafec',  # Evaluación Fecha
-                'fecnac',  # Fecha de nacimiento
-                'dopfec1',  # Fecha inicio para documentación
-                'dopfec2',  # Fecha final para documentación
-                'abofec1',  # Abonado, Fecha inicio abono
-                'abofec2'  # Abonado, Fecha fin abono
-            ],
-            'foreign_keys': [
-            ],
-            'data_cleaning': {}
-        },
-        'prv': {
-            'source_table': 'prv',
-            'target_table': 'DimProveedor',  # Ajusta el nombre si es necesario
-            'primary_key': 'ide',
-            'rename_columns': {
-                # Si quieres renombrar columnas, añádelas aquí
-                # 'raz': 'razon_social'
-            },
-            'date_columns': [
-                'fecnac',  # Fecha de nacimiento
-                'cerfeccad',  # Certificado: Fecha caducidad
-                'dopfec1',  # Fecha inicio para documentación
-                'dopfec2'   # Fecha final para documentación
-            ],
-            'foreign_keys': [
-            ],
-            'data_cleaning': {}
-        },
+        'source_table': 'cli',
+        'target_table': 'DimCliente',
+        'primary_key': 'ide',
+        'rename_columns': {},
+        'date_columns': [
+            'creevafec','evafec','fecnac','dopfec1','dopfec2','abofec1','abofec2'
+        ],
+        'foreign_keys': [],
+        'data_cleaning': {},
+        # Join con con a través de ide
+        'join_with_con': {
+            'join_column': 'ide'
+        }
+    },
+    'prv': {
+        'source_table': 'prv',
+        'target_table': 'DimProveedor',
+        'primary_key': 'ide',
+        'rename_columns': {},
+        'date_columns': ['fecnac','cerfeccad','dopfec1','dopfec2'],
+        'foreign_keys': [],
+        'data_cleaning': {},
+        # Join con con a través de ide
+        'join_with_con': {
+            'join_column': 'ide'
+        }
+    },
+    'dcf': {
+        'source_table': 'dcf',
+        'target_table': 'DimFacturaCompra',
+        'primary_key': 'ide',
+        'rename_columns': {},
+        'date_columns': [
+            'fecdoc', 'fecpag', 'fecent', 'feclim', 'fecrec',
+            'fecfac', 'alqfec', 'divcamfec'
+        ],
+        'foreign_keys': [],
+        'data_cleaning': {},
+        # join con con a traves de docide
+    },
+    'dcfpro': {
+        'source_table': 'dcfpro',
+        'target_table': 'DimFacturaCompraProductos',
+        'primary_key': 'ide',
+        'rename_columns': {},
+        'date_columns': ['fec','garfec','fecimp'],
+        'foreign_keys': [],
+        'data_cleaning': {},
+        # join con con a traves de docide
+        'join_with_con': {
+            'join_column': 'docide'
+        }
     }
+}
