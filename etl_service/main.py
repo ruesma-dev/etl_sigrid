@@ -69,8 +69,8 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         tables_to_transfer = sys.argv[1:]
     else:
-        # tables_to_transfer = ['dcf', 'dcfpro', 'cli', 'pro', 'cob', 'dvf', 'dvfpro', 'obr', 'obrctr', 'obrparpar', 'cen', 'con', 'auxobrtip', 'auxobrcla', 'conest', 'dca', 'ctr', 'dcapro', 'dcaproana', 'dcaprodes', 'dcapropar', 'dcaproser', 'dcarec', 'cer', 'cerpro']
-        tables_to_transfer = ['auxobrtip']
+        # tables_to_transfer = ['obrfas', 'auxobramb', 'obrparpre', 'tar', 'dcf', 'dcfpro', 'cli', 'pro', 'cob', 'dvf', 'dvfpro', 'obr', 'obrctr', 'obrparpar', 'cen', 'con', 'auxobrtip', 'auxobrcla', 'conest', 'dca', 'ctr', 'dcapro', 'dcaproana', 'dcaprodes', 'dcapropar', 'dcaproser', 'dcarec', 'cer', 'cerpro']
+        tables_to_transfer = ['hmo', 'hmores']
         # tables_to_transfer = ['obr']
     main(tables_to_transfer)
 
@@ -84,4 +84,5 @@ if __name__ == '__main__':
 # TODO: excel con datos adicionales como presu, ODC aprobadas, pendientes, etc...
 
 # TODO: incluir excel cierre en base de datos, crea tabla con bbdd de proyecto en postgres
-# TODO:
+# TODO: estudiar fases para planificacion temporal
+# TODO: visual coste y planificacion a partir de obrparpre

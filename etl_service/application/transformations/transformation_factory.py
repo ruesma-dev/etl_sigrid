@@ -14,6 +14,8 @@ from etl_service.application.transformations.delete_rows_transformation import D
 from etl_service.application.transformations.combine_columns_transformation import CombineColumnsTransformation
 from etl_service.application.transformations.join_with_con_transformation import JoinWithConTransformation
 from etl_service.domain.interfaces import SpecificTableTransformations
+from etl_service.application.transformations.clean_null_chars_transformation import \
+                CleanNullCharsTransformation
 
 class TransformationFactory:
     con_df = None
@@ -111,7 +113,7 @@ class TransformationFactory:
                 mod = importlib.import_module(module_name)
                 TransformClass = getattr(mod, class_name, None)
                 if TransformClass and issubclass(TransformClass, SpecificTableTransformations):
-                    if table_key == 'dca':
+                    if table_key in ['dca', 'dcapro']:
                         # Pasar extract_use_case como parámetro
                         specific_instance = TransformClass(extract_use_case)
                     else:
@@ -120,6 +122,10 @@ class TransformationFactory:
 
                     specific_transformations = specific_instance.get_table_transformations()
                     transformations.extend(specific_transformations)
+
+            # Añadir la transformación para limpiar NUL chars
+
+            transformations.append(CleanNullCharsTransformation())
 
         else:
             logging.warning(f"No se encontraron mapeos de columnas para la tabla '{table_key}'. No se aplicarán transformaciones específicas.")

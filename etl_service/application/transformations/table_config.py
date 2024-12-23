@@ -353,5 +353,123 @@ TABLE_CONFIG = {
         'join_with_con': {
             'join_column': 'docide'
         }
-    }
+    },
+    'tar': {
+        'source_table': 'tar',  # Nombre de la tabla en la base de datos de origen
+        'target_table': 'DimTarea',  # Ajusta el nombre según tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+            # Si deseas renombrar columnas, agrégalos aquí
+            # 'numord': 'numero_orden'
+        },
+        'date_columns': [
+            'fecestini',   # Fecha inicio estimada
+            'fecestfin',   # Fecha final estimada
+            'feclim',      # Fecha límite
+            'fecreaini',   # Fecha inicio real
+            'fecreafin',   # Fecha final real
+        ],
+        'foreign_keys': [
+        ],
+        'data_cleaning': {},
+        'join_with_con': {
+            'join_column': 'obride'  # La columna en tar que se usará para machar con con.ide
+        }
+    },
+    'obrparpre': {
+        'source_table': 'obrparpre',  # Nombre de la tabla en la base de datos de origen
+        'target_table': 'DimPresupuestoMediciones',  # Ajusta el nombre según tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+            # Si deseas renombrar columnas, agrégalas aquí
+            # Ejemplo: 'tex': 'descripcion_larga'
+        },
+        'date_columns': [
+            # No hay columnas de tipo fecha en esta tabla
+        ],
+        'foreign_keys': [
+        ],
+        'data_cleaning': {},
+        'join_with_con': {
+        }
+    },
+    'auxobramb': {
+        'source_table': 'auxobramb',            # Nombre de la tabla en la BBDD origen
+        'target_table': 'DimAmbitoObra',        # Cambia si prefieres otro nombre de tabla destino
+        'primary_key': 'ide',
+        'rename_columns': {
+            'fecbaj': 'fecha_baja',
+            'res': 'resumen_ambito'
+        },
+        'date_columns': [
+            'fecbaj'
+        ],
+        'foreign_keys': [
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza específicas si fuera necesario
+        }
+    },
+    'obrfas': {
+        'source_table': 'obrfas',  # Nombre de la tabla en la BBDD origen
+        'target_table': 'DimObraFases',  # Cambia si prefieres otro nombre de tabla destino
+        'primary_key': 'ide',
+        'rename_columns': {
+            'fecini': 'fecha_inicio',
+            'fecfin': 'fecha_fin',
+            'res': 'nombre_fase'
+        },
+        'date_columns': [
+            'fecini', 'fecfin'
+        ],
+        'foreign_keys': [
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza específicas si fuera necesario
+        }
+    },
+    'hmores': {
+        'source_table': 'hmores',
+        'target_table': 'DimPartesTrabajoDetalle',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+            # Añade renombrados de columnas si lo necesitas, ejemplo:
+            # 'tex': 'descripcion_detalle'
+        },
+        'date_columns': [
+            'fec',     # Fecha principal
+            'fec1',    # Fecha1 alquiler
+            'fec2'     # Fecha2 alquiler
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede, por ejemplo:
+            # {
+            #     'column': 'obride',
+            #     'ref_table': 'FactObra',
+            #     'ref_column': 'ide'
+            # }
+        ],
+        'data_cleaning': {
+            # Ajusta opciones de limpieza si es necesario
+        }
+    },
+
+    'hmo': {
+        'source_table': 'hmo',
+        'target_table': 'DimPartesTrabajo',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+            # Añade renombrados de columnas si lo necesitas, ejemplo:
+            # 'reside': 'recurso_asociado'
+        },
+        'date_columns': [
+            'feccie'   # Fecha de cierre diario
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
 }

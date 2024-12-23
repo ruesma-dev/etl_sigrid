@@ -5,3 +5,5 @@ __pycache__/
 .env
 .venv/
 *.log
+/etl_service/eda_results/
+/etl_service/export_postgres_csv/
