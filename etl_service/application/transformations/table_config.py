@@ -104,7 +104,10 @@ TABLE_CONFIG = {
             'fecfac', 'alqfec', 'divcamfec'
         ],
         'foreign_keys': [],
-        'data_cleaning': {}
+        'data_cleaning': {},
+        'join_with_con': {
+            'join_column': 'ide'
+        }
     },
     'ctr': {
         'source_table': 'ctr',
@@ -339,7 +342,9 @@ TABLE_CONFIG = {
         ],
         'foreign_keys': [],
         'data_cleaning': {},
-        # join con con a traves de docide
+        'join_with_con': {
+            'join_column': 'ide'
+        }
     },
     'dcfpro': {
         'source_table': 'dcfpro',
@@ -453,7 +458,6 @@ TABLE_CONFIG = {
             # Ajusta opciones de limpieza si es necesario
         }
     },
-
     'hmo': {
         'source_table': 'hmo',
         'target_table': 'DimPartesTrabajo',  # Ajusta el nombre a tu convención
