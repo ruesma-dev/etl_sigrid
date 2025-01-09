@@ -1,4 +1,4 @@
-# ETL Service for SQL Server to PostgreSQL
+# ETL Service for Sigrid to PowerBI thru SL Server & Postgres
 
 ![ETL Pipeline](https://img.shields.io/badge/ETL-Pipeline-blue)
 ![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
