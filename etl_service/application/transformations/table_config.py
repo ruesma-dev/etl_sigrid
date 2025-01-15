@@ -476,4 +476,20 @@ TABLE_CONFIG = {
             # Opciones de limpieza, si las requieres
         }
     },
+    'cve': {
+        'source_table': 'hmo',
+        'target_table': 'DimContratoVenta',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+
+        },
+        'date_columns': [
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
 }

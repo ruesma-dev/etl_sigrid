@@ -1,4 +1,4 @@
-# etl_service/application/transformations/second_phase_use_case.py
+# etl_service/application/transformations/second_phase_use_case_dca.py
 
 import logging
 import pandas as pd
@@ -6,7 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import text
 
 
-class SecondPhaseUseCase:
+class SecondPhaseUseCaseDcaDcfpro:
     """
     Clase para la segunda fase de ETL en PostgreSQL.
     Se asume que solo trabaja con la base de datos en PostgreSQL.
@@ -18,8 +18,8 @@ class SecondPhaseUseCase:
         self.postgres_repo = postgres_repo
 
     def execute_dca_dcfpro_join(self,
-                                dca_table="DimAlbaranCompra",
-                                dcfpro_table="DimFacturaCompraProductos"):
+                                dca_key="dca",
+                                dcfpro_key="dcfpro"):
         """
         Mantener EXACTAMENTE el número de filas de DCA.
         1) Leer la tabla DCA y la tabla DCFPRO.
@@ -30,7 +30,15 @@ class SecondPhaseUseCase:
         6) Sobrescribir la tabla DCA con las columnas nuevas.
         """
         try:
-            logging.info(f"=== [Segunda fase] Procesando '{dca_table}' vs '{dcfpro_table}' (mantener # filas DCA) ===")
+            logging.info(
+                f"=== [con → obr → dca] Creando 'codigo_obra' a partir de {dca_key}, {dcfpro_key} ===")
+
+            # 1) Obtener los nombres REALES de las tablas en la DB
+            dca_table = self._get_target_table_name(dca_key)
+            dcfpro_table = self._get_target_table_name(dcfpro_key)
+
+            logging.info(
+                f"Mapeo: {dca_key} => {dca_table}, {dcfpro_key} => {dcfpro_table}")
 
             # 1. Leer DCA
             dca_df = self._read_table_from_postgres(dca_table)
@@ -103,6 +111,17 @@ class SecondPhaseUseCase:
     # --------------------------------------------------------------------------
     # Métodos de apoyo
     # --------------------------------------------------------------------------
+    def _get_target_table_name(self, table_key: str) -> str:
+        """
+        Retorna el 'target_table' real definido en table_config
+        (si no se encuentra, retorna el key tal cual).
+        """
+        from etl_service.application.transformations.table_config import TABLE_CONFIG
+
+        if table_key in TABLE_CONFIG:
+            return TABLE_CONFIG[table_key].get('target_table', table_key)
+        else:
+            return table_key
 
     def _read_table_from_postgres(self, table_name: str) -> pd.DataFrame:
         """
@@ -144,3 +163,5 @@ class SecondPhaseUseCase:
         except Exception as e:
             logging.error(f"Error al sobrescribir la tabla '{table_name}': {e}")
             raise
+
+
