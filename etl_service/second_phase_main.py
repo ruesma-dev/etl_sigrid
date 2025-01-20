@@ -104,6 +104,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         process_flag = sys.argv[1]
     else:
-        process_flag = 'dcapro'  # Ejecuta todo por defecto
+        process_flag = 'all'  # Ejecuta todo por defecto
 
     main_second_phase(process=process_flag)

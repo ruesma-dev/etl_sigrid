@@ -69,8 +69,8 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         tables_to_transfer = sys.argv[1:]
     else:
-        # tables_to_transfer = ['hmo', 'hmores', 'obrfas', 'auxobramb', 'obrparpre', 'tar', 'dcf', 'dcfpro', 'cli', 'pro', 'cob', 'dvf', 'dvfpro', 'obr', 'obrctr', 'obrparpar', 'cen', 'con', 'auxobrtip', 'auxobrcla', 'conest', 'dca', 'ctr', 'dcapro', 'dcaproana', 'dcaprodes', 'dcapropar', 'dcaproser', 'dcarec', 'cer', 'cerpro']
-        tables_to_transfer = ['obrfasamb' ]
+        tables_to_transfer = ['obrfasamb' , 'hmo', 'hmores', 'obrfas', 'auxobramb', 'obrparpre', 'tar', 'dcf', 'dcfpro', 'cli', 'pro', 'cob', 'dvf', 'dvfpro', 'obr', 'obrctr', 'obrparpar', 'cen', 'con', 'auxobrtip', 'auxobrcla', 'conest', 'dca', 'ctr', 'dcapro', 'dcaproana', 'dcaprodes', 'dcapropar', 'dcaproser', 'dcarec', 'cer', 'cerpro']
+        # tables_to_transfer = ['obrfasamb' ]
         # tables_to_transfer = ['obr']
     main(tables_to_transfer)
 
