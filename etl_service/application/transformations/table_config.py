@@ -492,4 +492,21 @@ TABLE_CONFIG = {
             # Opciones de limpieza, si las requieres
         }
     },
+    'obrfasamb': {
+        'source_table': 'obrfasamb',
+        'target_table': 'DimFasesAmbito',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+
+        },
+        'date_columns': [
+            'feccie', 'fec', 'plafec', 'ofefecpre'
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
 }

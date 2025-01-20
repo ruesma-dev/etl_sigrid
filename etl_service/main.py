@@ -70,7 +70,7 @@ if __name__ == '__main__':
         tables_to_transfer = sys.argv[1:]
     else:
         # tables_to_transfer = ['hmo', 'hmores', 'obrfas', 'auxobramb', 'obrparpre', 'tar', 'dcf', 'dcfpro', 'cli', 'pro', 'cob', 'dvf', 'dvfpro', 'obr', 'obrctr', 'obrparpar', 'cen', 'con', 'auxobrtip', 'auxobrcla', 'conest', 'dca', 'ctr', 'dcapro', 'dcaproana', 'dcaprodes', 'dcapropar', 'dcaproser', 'dcarec', 'cer', 'cerpro']
-        tables_to_transfer = ['cve' ]
+        tables_to_transfer = ['obrfasamb' ]
         # tables_to_transfer = ['obr']
     main(tables_to_transfer)
 
@@ -91,3 +91,5 @@ if __name__ == '__main__':
 # TODO: coste por factura, y alabranes sin facturas, esos costes si se meten por albaran
 
 # TODO: las facturas que no tengan partida, ver el centro de coste y su codigo para asignar. mirar el csv que sale d ela EDA. al hacer el join se multiplicadn las lineas
+
+# TODO: en obrparpre hay que hacer columna nueva que sea pre * can
