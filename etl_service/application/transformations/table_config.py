@@ -509,4 +509,89 @@ TABLE_CONFIG = {
             # Opciones de limpieza, si las requieres
         }
     },
+    'obrlba': {
+        'source_table': 'obrlba',
+        'target_table': 'DimLineasPlanifacion',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+
+        },
+        'date_columns': [
+            'fec'
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
+    'obrlbatar': {
+        'source_table': 'obrlbatar',
+        'target_table': 'DimObraTareas',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+
+        },
+        'date_columns': [
+            'fecini', 'fecfin'
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
+    'obrpas': {
+        'source_table': 'obrpas',
+        'target_table': 'DimPasos',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+
+        },
+        'date_columns': [
+            'fecini', 'fecfin'
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
+    'obrper': {
+        'source_table': 'obrper',
+        'target_table': 'DimPeriodos',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+
+        },
+        'date_columns': [
+            'fecini', 'fecfin'
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
+    'rob': {
+        'source_table': 'rob',
+        'target_table': 'DimMensual',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+
+        },
+        'date_columns': [
+
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
 }
