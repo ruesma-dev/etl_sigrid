@@ -10,6 +10,8 @@ from application.transformations.second_phase_use_case_dca import SecondPhaseUse
 from application.transformations.second_phase_use_case_obrparpar import SecondPhaseUseCaseConObraObrparpar
 from application.transformations.second_phase_use_case_dca_con import SecondPhaseUseCaseConObraDca
 from application.transformations.second_phase_use_case_dcapro import SecondPhaseUseCaseDcaproObrparpar
+from application.transformations.second_phase_use_case_obrparpre_planif import SecondPhaseUseCaseObrparprePlanif
+
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -40,6 +42,7 @@ def main_second_phase(process="all"):
         con_obra_obrparpar_use_case = SecondPhaseUseCaseConObraObrparpar(postgres_repo)
         con_obra_dca_use_case = SecondPhaseUseCaseConObraDca(postgres_repo)
         second_phase_use_case_dcapro_par = SecondPhaseUseCaseDcaproObrparpar(postgres_repo)
+        obrparpre_planif_use_case = SecondPhaseUseCaseObrparprePlanif(postgres_repo)
 
         if process == "dca" or process == "all":
             # Llamar la función de join DCA <-> DCFPRO
@@ -84,6 +87,28 @@ def main_second_phase(process="all"):
                 obrparpar_key=obrparpar_key
             )
 
+        if process == "obrparpre_master_coste" or process == "all":
+            # Llamar el nuevo caso de uso para planif
+            obrparpre_key = "obrparpre"  # Clave original en TABLE_CONFIG
+            new_table_key = "obrparpre_master_coste"  # Clave para la nueva tabla en TABLE_CONFIG
+            logging.info("=== [Segunda fase] Llamando execute_obrparpre_planif_transform ===")
+            obrparpre_planif_use_case.execute_obrparpre_planif_transform(
+                obrparpre_key=obrparpre_key,
+                new_table_key=new_table_key,
+                ambito=8
+            )
+
+        if process == "obrparpre_master_venta" or process == "all":
+            # Llamar el nuevo caso de uso para planif
+            obrparpre_key = "obrparpre"  # Clave original en TABLE_CONFIG
+            new_table_key = "obrparpre_master_venta"  # Clave para la nueva tabla en TABLE_CONFIG
+            logging.info("=== [Segunda fase] Llamando execute_obrparpre_planif_transform ===")
+            obrparpre_planif_use_case.execute_obrparpre_planif_transform(
+                obrparpre_key=obrparpre_key,
+                new_table_key=new_table_key,
+                ambito=11
+            )
+
     except Exception as e:
         logging.error(f"Error en la segunda fase: {e}")
     finally:
@@ -104,6 +129,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         process_flag = sys.argv[1]
     else:
-        process_flag = 'all'  # Ejecuta todo por defecto
+        process_flag = 'obrparpre_master_coste'  # Ejecuta todo por defecto
 
     main_second_phase(process=process_flag)

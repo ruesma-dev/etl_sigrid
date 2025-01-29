@@ -80,16 +80,10 @@ if __name__ == '__main__':
 # TODO: falta tema de OEPC como ingresos.
 # TODO: albaranes sin codigo?
 # TODO: almacen
-# TODO: reglas para desglose de partidas en CD, CI, y GG
+# TODO: cada obra debe tener las partidas de CI asignadas a un tipo de coste.
 # TODO: excel con datos adicionales como presu, ODC aprobadas, pendientes, etc...
 
 # TODO: incluir excel cierre en base de datos, crea tabla con bbdd de proyecto en postgres
-# TODO: estudiar fases para planificacion temporal
-# TODO: visual coste y planificacion a partir de obrparpre
 
-# TODO: partidas con CI son Coste indirecto, CP, son generales y deben salir ddel coste del proyecto y NTC van contra retencion del proveedor, asi que tambien salen
-# TODO: coste por factura, y alabranes sin facturas, esos costes si se meten por albaran
-
-# TODO: las facturas que no tengan partida, ver el centro de coste y su codigo para asignar. mirar el csv que sale d ela EDA. al hacer el join se multiplicadn las lineas
-
-# TODO: en obrparpre hay que hacer columna nueva que sea pre * can
+#TODO: en obrparpre_plnif, se debe añadir una columna nueva que sea la fecha de esa fase-mes. a partir de la fecha de inicio se suma la fase-mes-1 al mes, teniendo en cuenta que se suman mese pero no dias, por lo que solo deb pasar un mes si al 31-08 le sumamos un mes, deberia ser 30-09.
+#TODO: solo se esta haciedno el estudio de planificacion valorada para ambito 8 (master coste)
