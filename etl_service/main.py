@@ -69,9 +69,9 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         tables_to_transfer = sys.argv[1:]
     else:
-        # tables_to_transfer = ['obrfasamb' , 'hmo', 'hmores', 'obrfas', 'auxobramb', 'obrparpre', 'tar', 'dcf', 'dcfpro', 'cli', 'pro', 'cob', 'dvf', 'dvfpro', 'obr', 'obrctr', 'obrparpar', 'cen', 'con', 'auxobrtip', 'auxobrcla', 'conest', 'dca', 'ctr', 'dcapro', 'dcaproana', 'dcaprodes', 'dcapropar', 'dcaproser', 'dcarec', 'cer', 'cerpro']
+        tables_to_transfer = ['res', 'age', 'emp', 'conext', 'defext', 'obrfasamb' , 'hmo', 'hmores', 'obrfas', 'auxobramb', 'obrparpre', 'tar', 'dcf', 'dcfpro', 'cli', 'pro', 'cob', 'dvf', 'dvfpro', 'obr', 'obrctr', 'obrparpar', 'cen', 'con', 'auxobrtip', 'auxobrcla', 'conest', 'dca', 'ctr', 'dcapro', 'dcaproana', 'dcaprodes', 'dcapropar', 'dcaproser', 'dcarec', 'cer', 'cerpro']
         # tables_to_transfer = ['obrlba', 'obrlbatar', 'obrpas', 'obrper' ]
-        tables_to_transfer = ['rob']
+        # tables_to_transfer = ['auxhor']
     main(tables_to_transfer)
 
 
@@ -85,5 +85,8 @@ if __name__ == '__main__':
 
 # TODO: incluir excel cierre en base de datos, crea tabla con bbdd de proyecto en postgres
 
-#TODO: en obrparpre_plnif, se debe añadir una columna nueva que sea la fecha de esa fase-mes. a partir de la fecha de inicio se suma la fase-mes-1 al mes, teniendo en cuenta que se suman mese pero no dias, por lo que solo deb pasar un mes si al 31-08 le sumamos un mes, deberia ser 30-09.
-#TODO: solo se esta haciedno el estudio de planificacion valorada para ambito 8 (master coste)
+# TODO: en el contrato, en el numero de meses, falla mucho, ver porque.
+# TODO: ver venta a origen de obra 674, porque hay un descenso a origen en 2024-01
+# TODO: Grafico de beneficio por partidas, (las mejores y las peores
+# TODO: grafico de partidas con mayor y menos desviacion
+# TODO: grafico de partidas con mayor perdida planificada

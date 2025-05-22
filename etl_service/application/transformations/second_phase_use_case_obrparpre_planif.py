@@ -250,9 +250,15 @@ class SecondPhaseUseCaseObrparprePlanif:
             # final_df.to_csv(output_csv, index=False, encoding='utf-8')
             # logging.info(f"Se ha guardado el CSV filtrado para obride = 2098292: {output_csv}")
             # logging.info("=== Comienzo de carga ===")
+            logging.info(f"Filtrando filas donde 'amb' == {ambito}")
+            final_df = final_df[final_df['amb'] == ambito]
+
+            logging.info(f"Filtrado completado. Filas restantes: {len(final_df)}")
 
             self._create_new_table(new_table, final_df)
             logging.info(f"Tabla '{new_table}' creada (o recreada) con el contenido de final_df en PostgreSQL.")
+
+
 
             logging.info("=== Proceso completado (CSV y Tabla en PostgreSQL) ===")
 

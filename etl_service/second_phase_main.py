@@ -11,6 +11,8 @@ from application.transformations.second_phase_use_case_obrparpar import SecondPh
 from application.transformations.second_phase_use_case_dca_con import SecondPhaseUseCaseConObraDca
 from application.transformations.second_phase_use_case_dcapro import SecondPhaseUseCaseDcaproObrparpar
 from application.transformations.second_phase_use_case_obrparpre_planif import SecondPhaseUseCaseObrparprePlanif
+from application.transformations.second_phase_use_case_obrparpre_fecha import SecondPhaseUseCaseObrparpreFecha
+from application.transformations.second_phase_use_case_obrfas_adjust import SecondPhaseUseCaseObrfasAdjust
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -43,6 +45,9 @@ def main_second_phase(process="all"):
         con_obra_dca_use_case = SecondPhaseUseCaseConObraDca(postgres_repo)
         second_phase_use_case_dcapro_par = SecondPhaseUseCaseDcaproObrparpar(postgres_repo)
         obrparpre_planif_use_case = SecondPhaseUseCaseObrparprePlanif(postgres_repo)
+        obrparpre_fecha_use_case = SecondPhaseUseCaseObrparpreFecha(postgres_repo)
+        obrfas_fill_use_case = SecondPhaseUseCaseObrfasAdjust(postgres_repo)
+
 
         if process == "dca" or process == "all":
             # Llamar la función de join DCA <-> DCFPRO
@@ -109,6 +114,48 @@ def main_second_phase(process="all"):
                 ambito=11
             )
 
+        if process == "obrparpre_venta" or process == "all":
+            # Llamar el nuevo caso de uso para planif
+            obrparpre_key = "obrparpre"  # Clave original en TABLE_CONFIG
+            new_table_key = "obrparpre_venta"  # Clave para la nueva tabla en TABLE_CONFIG
+            logging.info("=== [Segunda fase] Llamando execute_obrparpre_planif_transform ===")
+            obrparpre_planif_use_case.execute_obrparpre_planif_transform(
+                obrparpre_key=obrparpre_key,
+                new_table_key=new_table_key,
+                ambito=7
+            )
+
+        if process == "obrparpre_coste" or process == "all":
+            # Llamar el nuevo caso de uso para planif
+            obrparpre_key = "obrparpre"  # Clave original en TABLE_CONFIG
+            new_table_key = "obrparpre_coste"  # Clave para la nueva tabla en TABLE_CONFIG
+            logging.info("=== [Segunda fase] Llamando execute_obrparpre_planif_transform ===")
+            obrparpre_planif_use_case.execute_obrparpre_planif_transform(
+                obrparpre_key=obrparpre_key,
+                new_table_key=new_table_key,
+                ambito=3
+            )
+
+        if process == "obrparpre_fecha" or process == "all":
+            # Llamar la nueva función
+            logging.info("=== [Segunda fase] Copiando fecha_fin a obrparpre (unión por composite_key) ===")
+            obrparpre_table_key = "obrparpre"  # el "source"
+            obrfas_table_key = "obrfas"  # la tabla con fecha_fin
+            new_table_key = "obrparpre_fecha_fin"  # la tabla resultante
+            obrparpre_fecha_use_case.execute_copy_fecha_fin(
+                obrparpre_table_key=obrparpre_table_key,
+                obrfas_table_key=obrfas_table_key,
+                new_table_key=new_table_key,
+                composite_key="composite_key"  # ajusta si se llama distinto
+            )
+
+        if process == "obrfas_adjust" or process == "all":
+            logging.info("=== [Segunda fase] Rellenando huecos de mes en obrfas ===")
+            obrfas_fill_use_case.execute_adjust_fechas(
+                obrfas_table_key="obrfas",
+                new_table_key="obrfas_filled"
+            )
+
     except Exception as e:
         logging.error(f"Error en la segunda fase: {e}")
     finally:
@@ -129,6 +176,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         process_flag = sys.argv[1]
     else:
-        process_flag = 'obrparpre_master_coste'  # Ejecuta todo por defecto
+        process_flag = 'all'  # Ejecuta todo por defecto
 
     main_second_phase(process=process_flag)

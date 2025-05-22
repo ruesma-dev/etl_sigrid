@@ -594,4 +594,106 @@ TABLE_CONFIG = {
             # Opciones de limpieza, si las requieres
         }
     },
+    'conext': {
+        'source_table': 'conext',
+        'target_table': 'DimCamposExtValores',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+
+        },
+        'date_columns': [
+
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
+    'defext': {
+        'source_table': 'defext',
+        'target_table': 'DimCamposExtDefinicion',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+
+        },
+        'date_columns': [
+
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
+    'emp': {
+        'source_table': 'emp',
+        'target_table': 'DimEmpleados',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+
+        },
+        'date_columns': [
+
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
+    'age': {
+        'source_table': 'age',
+        'target_table': 'DimAgentes',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+
+        },
+        'date_columns': [
+
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
+    'res': {
+        'source_table': 'res',
+        'target_table': 'DimRecursos',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+
+        },
+        'date_columns': [
+
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
+    'auxhor': {
+        'source_table': 'auxhor',
+        'target_table': 'DimTipoHora',  # Ajusta el nombre a tu convención
+        'primary_key': 'ide',
+        'rename_columns': {
+
+        },
+        'date_columns': [
+
+        ],
+        'foreign_keys': [
+            # Añade claves foráneas si procede
+        ],
+        'data_cleaning': {
+            # Opciones de limpieza, si las requieres
+        }
+    },
 }

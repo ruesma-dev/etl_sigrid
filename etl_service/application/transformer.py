@@ -29,3 +29,5 @@ class Transformer:
         except Exception as e:
             logging.error(f"Error durante la transformación de la tabla '{table_key}': {e}")
             raise
+
+
