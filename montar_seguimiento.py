@@ -1,96 +1,79 @@
-import pandas as pd
+# etl/procesar_archivos_gastos.py
 import os
 import glob
+import pandas as pd
 
 
-def procesar_archivos_gastos():
-    # 1. Especificar la carpeta donde están los archivos
-    nombre_carpeta = "seguimiento"
-    ruta_carpeta = os.path.join(os.getcwd(), nombre_carpeta)
+def procesar_archivos_gastos() -> tuple[pd.DataFrame, pd.DataFrame] | tuple[None, None]:
+    """
+    Lee los .txt de la carpeta 'seguimiento', genera:
+      1) tabla_dim_gastos  … dimensión con Gasto único
+      2) tabla_hechos      … códigos + foreign-key a la dimensión
+    Devuelve (tabla_hechos, tabla_dim_gastos).
+    """
+    carpeta = os.path.join(os.getcwd(), "seguimiento")
+    patron  = os.path.join(carpeta, "*.txt")
 
-    if not os.path.isdir(ruta_carpeta):
-        print(f"Error: La carpeta '{nombre_carpeta}' no se encuentra en el directorio actual.")
-        print(f"Directorio actual: {os.getcwd()}")
-        return None, None
+    if not os.path.isdir(carpeta):
+        print(f"Carpeta '{carpeta}' inexistente"); return None, None
 
-    patron_archivos = os.path.join(ruta_carpeta, "*.txt")
-    archivos_txt = glob.glob(patron_archivos)
+    archivos = glob.glob(patron)
+    if not archivos:
+        print("No hay .txt que procesar"); return None, None
 
-    if not archivos_txt:
-        print(f"No se encontraron archivos .txt en la carpeta '{nombre_carpeta}'.")
-        return None, None
-
-    lista_dataframes = []
-    print(f"Archivos .txt encontrados en '{nombre_carpeta}':")
-    for archivo in archivos_txt:
-        nombre_archivo_sin_extension = os.path.splitext(os.path.basename(archivo))[0]
-        print(f" - Procesando: {os.path.basename(archivo)} (Codigo_Proyecto: {nombre_archivo_sin_extension})")
+    # ---------- Lectura ----------
+    dfs: list[pd.DataFrame] = []
+    for path in archivos:
+        nombre = os.path.splitext(os.path.basename(path))[0]          # Codigo_Proyecto
         try:
-            df_temp = pd.read_csv(archivo, sep=',', dtype=str)
-            if not df_temp.empty and list(df_temp.columns) == ['Codigo', 'Gasto', 'Categoria']:
-                df_temp[
-                    'Codigo_Proyecto'] = nombre_archivo_sin_extension  # Añadir el nombre del archivo como Codigo_Proyecto
-                lista_dataframes.append(df_temp)
-            else:
-                print(
-                    f"Advertencia: El archivo {os.path.basename(archivo)} no tiene el formato esperado (Codigo,Gasto,Categoria) o está vacío. Se omitirá.")
-        except Exception as e:
-            print(f"Error al leer el archivo {os.path.basename(archivo)}: {e}")
+            df = pd.read_csv(path, sep=",", dtype=str)
+        except Exception as exc:
+            print(f"Error leyendo {path}: {exc}"); continue
 
-    if not lista_dataframes:
-        print("No se pudieron leer datos válidos de ningún archivo .txt.")
-        return None, None
+        if list(df.columns) != ["Codigo", "Gasto", "Categoria"] or df.empty:
+            print(f"Omitido {path}: formato inesperado"); continue
 
-    # 2. Concatenar todos los DataFrames
-    df_concatenado = pd.concat(lista_dataframes, ignore_index=True)
-    df_concatenado.fillna('', inplace=True)
+        df["Codigo_Proyecto"] = nombre
+        dfs.append(df)
 
-    # 3. Crear Tabla_Gastos_Categorias (dimensión de Gasto-Categoria)
-    # Ahora incluimos Codigo_Proyecto para asegurar que ID_Gasto_Categoria sea único
-    # si el mismo Gasto-Categoria puede aparecer en diferentes proyectos.
-    # Si quieres que Gasto-Categoria sea globalmente único sin importar el proyecto,
-    # entonces no incluyas Codigo_Proyecto aquí. Por ahora, lo mantendremos como está
-    # en tu solicitud original: ID único para Gasto-Categoria.
-    df_gastos_categorias_dim = df_concatenado[['Gasto', 'Categoria']].drop_duplicates().reset_index(drop=True)
-    df_gastos_categorias_dim['ID_Gasto_Categoria'] = df_gastos_categorias_dim.index + 1
-    df_gastos_categorias_dim = df_gastos_categorias_dim[['ID_Gasto_Categoria', 'Gasto', 'Categoria']]
+    if not dfs:
+        print("Sin datos válidos"); return None, None
 
-    # 4. Preparar Tabla_Codigos
-    df_concatenado['ID_Gasto'] = df_concatenado.index + 1
+    df_raw = pd.concat(dfs, ignore_index=True).fillna("")
 
-    df_final_codigos = pd.merge(
-        df_concatenado,
-        df_gastos_categorias_dim,
-        on=['Gasto', 'Categoria'],
-        how='left'
-    )
+    # ---------- Dimensión Gasto único ----------
+    dim_gastos = (df_raw[["Gasto", "Categoria"]]
+                  .drop_duplicates(subset=["Gasto"])         # <-- Gasto ÚNICO
+                  .reset_index(drop=True))
+    dim_gastos["ID_Gasto"] = dim_gastos.index + 1
+    dim_gastos = dim_gastos[["ID_Gasto", "Gasto", "Categoria"]]
 
-    # Seleccionar y ordenar las columnas para Tabla_Codigos, incluyendo Codigo_Proyecto
-    tabla_codigos = df_final_codigos[['ID_Gasto', 'Codigo_Proyecto', 'Codigo', 'ID_Gasto_Categoria']]
+    # ---------- Hechos / tabla códigos ----------
+    df_raw["ID_Registro"] = df_raw.index + 1
+    hechos = (df_raw
+              .merge(dim_gastos[["ID_Gasto", "Gasto"]], on="Gasto", how="left")
+              [["ID_Registro", "Codigo_Proyecto", "Codigo",
+                "Categoria", "ID_Gasto"]])
 
-    tabla_gastos_categorias = df_gastos_categorias_dim
+    # ---------- Validación opcional ----------
+    assert dim_gastos["Gasto"].is_unique, "¡La dimensión no es única en Gasto!"
 
-    return tabla_codigos, tabla_gastos_categorias
+    return hechos, dim_gastos
 
 
-# --- Ejecución del script ---
 if __name__ == "__main__":
-    tabla_codigos_final, tabla_gastos_categorias_final = procesar_archivos_gastos()
+    tabla_codigos, tabla_gastos = procesar_archivos_gastos()
+    if tabla_codigos is None:
+        exit()
 
-    if tabla_codigos_final is not None and tabla_gastos_categorias_final is not None:
-        print("\n--- Tabla_Codigos ---")
-        print(tabla_codigos_final.head())
-        print(f"\nDimensiones de Tabla_Codigos: {tabla_codigos_final.shape}")
+    print("\n--- Tabla_Codigos ---")
+    print(tabla_codigos.head())
+    print(tabla_codigos.shape)
 
-        print("\n--- Tabla_Gastos_Categorias ---")
-        print(tabla_gastos_categorias_final.head())
-        print(f"\nDimensiones de Tabla_Gastos_Categorias: {tabla_gastos_categorias_final.shape}")
+    print("\n--- Tabla_Gastos (dimensión) ---")
+    print(tabla_gastos.head())
+    print(tabla_gastos.shape)
 
-        try:
-            tabla_codigos_final.to_csv("Tabla_Codigos_Generada.csv", index=False, sep=';')
-            tabla_gastos_categorias_final.to_csv("Tabla_Gastos_Categorias_Generada.csv", index=False, sep=';')
-            print(
-                "\nTablas guardadas como 'Tabla_Codigos_Generada.csv' y 'Tabla_Gastos_Categorias_Generada.csv' en el directorio del script.")
-            print("Se usó ';' como separador para evitar problemas con comas en los datos.")
-        except Exception as e:
-            print(f"\nError al guardar las tablas en CSV: {e}")
+    tabla_codigos.to_csv("Tabla_Codigos_Generada.csv", sep=";", index=False)
+    tabla_gastos.to_csv("Tabla_Gastos_Generada.csv",   sep=";", index=False)
+    print("\nCSV generados con separador ';'")

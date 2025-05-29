@@ -65,7 +65,7 @@ def get_all_sqlserver_tables(cfg: dict) -> List[str]:
 # Main pipeline
 # --------------------------------------------------------------------- #
 def main() -> None:  # noqa: D401
-    bak_path = os.path.join(Config.LOCAL_BAK_FOLDER, "ruesma202505210030.bak")
+    bak_path = os.path.join(Config.LOCAL_BAK_FOLDER, "ruesma202505270030.bak")
     if not os.path.exists(bak_path):
         logger.error("No existe el .bak en %s", bak_path)
         sys.exit(1)
